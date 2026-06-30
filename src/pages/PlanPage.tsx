@@ -226,13 +226,14 @@ function ActivityRow({
 }) {
   const meta = CATEGORY_META[activity.category]
   return (
-    <li
-      className={cn(
-        'flex items-start gap-3 px-5 py-4',
-        !first && 'border-t border-slate-100',
-        last && 'pb-5',
-      )}
-    >
+    <li className={cn(!first && 'border-t border-slate-100')}>
+      <Link
+        to="/week"
+        className={cn(
+          'group flex items-start gap-3 px-5 py-4 transition-colors hover:bg-slate-50',
+          last && 'pb-5',
+        )}
+      >
       <IconChip icon={activity.icon} size="h-10 w-10" iconClassName="h-5 w-5" />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -258,6 +259,11 @@ function ActivityRow({
           <p className="mt-2 text-sm text-slate-600">{activity.instructions}</p>
         )}
       </div>
+      <ChevronRight
+        className="h-4 w-4 shrink-0 self-center text-slate-300 transition-colors group-hover:text-brand-500"
+        aria-hidden
+      />
+      </Link>
     </li>
   )
 }

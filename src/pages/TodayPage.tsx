@@ -119,20 +119,29 @@ export function TodayPage() {
             />
           </div>
 
-          {/* context chips */}
+          {/* context chips — tap to view the full plan */}
           <div className="relative mt-5 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100">
+            <Link
+              to="/plan"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 transition-colors hover:border-brand-400 hover:bg-white/10"
+            >
               <StageIcon className="h-3.5 w-3.5 text-brand-400" />
               {stage.label}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100">
+            </Link>
+            <Link
+              to="/plan"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 transition-colors hover:border-brand-400 hover:bg-white/10"
+            >
               <PacingIcon className="h-3.5 w-3.5 text-brand-400" />
               {pacing.label} pace
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100">
+            </Link>
+            <Link
+              to="/plan"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 transition-colors hover:border-brand-400 hover:bg-white/10"
+            >
               <Sparkles className="h-3.5 w-3.5 text-brand-400" />
               {patient.programLabel}
-            </span>
+            </Link>
           </div>
         </div>
       </section>
@@ -140,14 +149,20 @@ export function TodayPage() {
       {/* 2) THIS WEEK SNAPSHOT ---------------------------------------------- */}
       <Card>
         <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center">
-          <ProgressRing value={adherence.pct} size={132} stroke={12} color={ringColor}>
-            <span className="text-3xl font-bold tracking-tight text-ink-900 tnum">
-              {pct(adherence.pct)}
-            </span>
-            <span className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              this week
-            </span>
-          </ProgressRing>
+          <Link
+            to="/week"
+            aria-label="Go to This Week to log activities"
+            className="shrink-0 rounded-full transition-transform hover:scale-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
+          >
+            <ProgressRing value={adherence.pct} size={132} stroke={12} color={ringColor}>
+              <span className="text-3xl font-bold tracking-tight text-ink-900 tnum">
+                {pct(adherence.pct)}
+              </span>
+              <span className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                this week
+              </span>
+            </ProgressRing>
+          </Link>
 
           <div className="w-full flex-1 text-center sm:text-left">
             <div className="flex items-center justify-center gap-2 sm:justify-start">
@@ -183,6 +198,7 @@ export function TodayPage() {
       {/* 3) QUICK STATS ROW -------------------------------------------------- */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <KpiCard
+          to="/progress"
           label="Current streak"
           icon="Flame"
           value={
@@ -196,6 +212,7 @@ export function TodayPage() {
           hint={`Best: ${num(d.streak.best)} ${plural(d.streak.best, 'week')}`}
         />
         <KpiCard
+          to="/rewards"
           label="Loyalty tier"
           icon={d.level.icon}
           value={d.level.tier}
@@ -206,6 +223,7 @@ export function TodayPage() {
           }
         />
         <KpiCard
+          to="/rewards"
           label="Points balance"
           icon="Coins"
           value={num(d.points.balance)}
@@ -310,7 +328,11 @@ export function TodayPage() {
                 const linked = plan.activities.find((a) => a.id === appt.activityId)
                 const ApptIcon = linked ? getIcon(linked.icon) : CalendarDays
                 return (
-                  <li key={appt.id} className="flex items-center gap-3 p-4">
+                  <li key={appt.id}>
+                    <Link
+                      to="/plan"
+                      className="flex items-center gap-3 p-4 transition-colors hover:bg-slate-50"
+                    >
                     <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-brand-400">
                       <ApptIcon className="h-5 w-5" />
                     </span>
@@ -336,6 +358,7 @@ export function TodayPage() {
                         })}
                       </p>
                     </div>
+                    </Link>
                   </li>
                 )
               })}

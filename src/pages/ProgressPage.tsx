@@ -115,6 +115,7 @@ export function ProgressPage() {
       {/* 1) KPI ROW ----------------------------------------------------------- */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
+          to="/week"
           label="Avg adherence"
           value={pct(avgAdherence)}
           icon="Gauge"
@@ -133,12 +134,14 @@ export function ProgressPage() {
           }
         />
         <KpiCard
+          to="/week"
           label="Best week"
           value={pct(bestWeek)}
           icon="Trophy"
           hint="Your highest weekly score"
         />
         <KpiCard
+          to="/rewards"
           label="Current streak"
           value={
             <>
@@ -156,6 +159,7 @@ export function ProgressPage() {
           }
         />
         <KpiCard
+          to="/rewards"
           label="Lifetime points"
           value={num(d.points.lifetime)}
           icon="Star"

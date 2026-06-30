@@ -46,6 +46,7 @@ export function RewardsPage() {
   // Local UI state — the celebratory banner shown after a successful redeem.
   const [lastRedeemed, setLastRedeemed] = useState<Redemption | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [openBadge, setOpenBadge] = useState<(typeof d.badges)[number] | null>(null)
 
   const balance = d.points.balance
   const LevelIcon = getIcon(d.level.icon)
@@ -358,16 +359,52 @@ export function RewardsPage() {
           subtitle={`${d.earnedBadges.length} of ${d.badges.length} earned`}
         />
         <Card>
+          {openBadge && (
+            <div className="mb-4 flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5">
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-700 ring-1 ring-brand-200">
+                {(() => {
+                  const Icon = getIcon(openBadge.icon)
+                  return <Icon className="h-5 w-5" />
+                })()}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold text-ink-900">{openBadge.name}</p>
+                  {openBadge.earned ? (
+                    <Pill tone="good">Earned</Pill>
+                  ) : (
+                    <Pill tone="neutral">Locked</Pill>
+                  )}
+                </div>
+                <p className="mt-0.5 text-xs text-slate-600">{openBadge.description}</p>
+                {!openBadge.earned && openBadge.hint && (
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    How to earn: {openBadge.hint}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenBadge(null)}
+                aria-label="Dismiss badge details"
+                className="shrink-0 rounded-lg p-1 text-slate-400 transition-colors hover:bg-white hover:text-ink-900"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {d.badges.map((badge) => {
               const BadgeIcon = getIcon(badge.icon)
               const tone = BADGE_TONE[badge.tone] ?? BADGE_TONE.brand
               if (badge.earned) {
                 return (
-                  <div
+                  <button
                     key={badge.id}
+                    type="button"
+                    onClick={() => setOpenBadge(badge)}
                     className={
-                      'flex flex-col items-center rounded-xl border border-slate-200 bg-white p-4 text-center ring-1 ' +
+                      'flex flex-col items-center rounded-xl border border-slate-200 bg-white p-4 text-center ring-1 transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 ' +
                       tone.ring
                     }
                   >
@@ -391,16 +428,18 @@ export function RewardsPage() {
                         <Pill tone={tone.chip}>Earned</Pill>
                       </p>
                     )}
-                  </div>
+                  </button>
                 )
               }
               // Locked badge — greyed, with hint + optional progress.
               const hasProgress = typeof badge.progress === 'number'
               const progressPct = (badge.progress ?? 0) * 100
               return (
-                <div
+                <button
                   key={badge.id}
-                  className="flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-center"
+                  type="button"
+                  onClick={() => setOpenBadge(badge)}
+                  className="flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-center transition-colors hover:border-brand-300 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
                 >
                   <span className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-400 grayscale">
                     <BadgeIcon className="h-6 w-6 opacity-60" />
@@ -419,7 +458,7 @@ export function RewardsPage() {
                       <ProgressBar value={progressPct} color="#cbd5e1" height={5} />
                     </div>
                   )}
-                </div>
+                </button>
               )
             })}
           </div>
