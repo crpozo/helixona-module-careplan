@@ -15,10 +15,19 @@ interface CardProps {
 /** The default container. STYLE.md §4. */
 export function Card({ title, subtitle, action, className, flush, children }: CardProps) {
   const hasHeader = title || subtitle || action
+  // Tailwind utilities don't override by class-string order, so when a caller
+  // supplies their own surface (e.g. a dark `bg-ink-900` card) we must DROP the
+  // defaults rather than emit both and let CSS ordering decide.
+  const cls = className ?? ''
+  const overridesBg = /(?:^|\s)bg-/.test(cls)
+  const overridesBorder =
+    /(?:^|\s)border-(?:slate|ink|brand|white|black|emerald|rose|amber|transparent)/.test(cls)
   return (
     <section
       className={cn(
-        'rounded-2xl border border-slate-200 bg-white shadow-sm',
+        'rounded-2xl border shadow-sm',
+        !overridesBg && 'bg-white',
+        !overridesBorder && 'border-slate-200',
         flush ? '' : 'p-5',
         className,
       )}
