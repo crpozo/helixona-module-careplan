@@ -55,14 +55,22 @@ they need to do each week, watch their progress, and earn points, badges and
 - All derived numbers (adherence, points, tiers, streaks, badges) are pure
   functions in `src/lib/gamification.ts`.
 
+## Live demo
+
+Deployed to GitHub Pages: **https://crpozo.github.io/helixona-module-careplan/**
+(published by `.github/workflows/deploy-pages.yml` on every push).
+
 ## Getting started
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5173/helixona-module-careplan/
 npm run build      # typecheck (tsc -b) + production build
-npm run preview    # serve the production build
+npm run preview    # serve the production build at the same base path
 ```
+
+The app is configured for project Pages (`base: /helixona-module-careplan/`)
+and uses `HashRouter` so deep links work without server-side rewrites.
 
 The app seeds a demo patient (Maya Alvarez) modeled on the clinic's POC sheets.
 Use **Staff Entry → Reset demo data** to start fresh.

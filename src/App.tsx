@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import { AppProvider } from '@/store/store'
 import { AppShell } from '@/components/AppShell'
 import { TodayPage } from '@/pages/TodayPage'
@@ -34,7 +34,7 @@ function RouteFallback() {
 export function App() {
   return (
     <AppProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<TodayPage />} />
@@ -81,7 +81,7 @@ export function App() {
             <Route path="*" element={<TodayPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AppProvider>
   )
 }
