@@ -25,7 +25,7 @@ export function Card({ title, subtitle, action, className, flush, children }: Ca
   return (
     <section
       className={cn(
-        'rounded-2xl border shadow-soft',
+        'rounded-2xl border shadow-sm',
         !overridesBg && 'bg-white',
         !overridesBorder && 'border-slate-200',
         flush ? '' : 'p-5',

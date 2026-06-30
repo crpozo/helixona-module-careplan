@@ -33,7 +33,7 @@ export function KpiCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-slate-200 bg-white p-4 shadow-soft transition-shadow hover:shadow-warm',
+        'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
         className,
       )}
     >

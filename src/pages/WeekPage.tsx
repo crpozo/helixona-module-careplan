@@ -66,7 +66,7 @@ export function WeekPage() {
   return (
     <div className="space-y-6">
       {/* 1) WEEK HEADER --------------------------------------------------- */}
-      <div>
+      <div className="lg:hidden">
         <h1 className="text-lg font-bold text-ink-900">This Week</h1>
         <p className="text-sm text-slate-400">Check off everything you do this week.</p>
       </div>
@@ -165,26 +165,26 @@ export function WeekPage() {
 
       {/* 3) TOTAL SUMMARY ------------------------------------------------- */}
       {hasActivities && (
-        <Card className="border-brand-200 bg-gradient-to-br from-brand-100 to-brand-50">
+        <Card className="border-ink-700/40 bg-ink-900 text-white">
           <div className="flex items-center gap-4">
             <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-ink-900">
               <Check className="h-5 w-5" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
                 Total this week
               </p>
-              <p className="mt-0.5 text-sm text-slate-600">
-                <span className="font-bold text-ink-900 tnum">{adherence.actual}</span> of{' '}
-                <span className="font-bold text-ink-900 tnum">{adherence.ordered}</span> activities
+              <p className="mt-0.5 text-sm text-slate-300">
+                <span className="font-bold text-white tnum">{adherence.actual}</span> of{' '}
+                <span className="font-bold text-white tnum">{adherence.ordered}</span> activities
                 completed
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-3xl font-bold tracking-tight text-brand-700 tnum">
+              <p className="text-3xl font-bold tracking-tight text-brand-400 tnum">
                 {pct(adherence.pct)}
               </p>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 adherence
               </p>
             </div>
@@ -194,7 +194,7 @@ export function WeekPage() {
               value={adherence.pct}
               color="#d6b981"
               height={10}
-              trackClassName="bg-white/70"
+              trackClassName="bg-white/10"
             />
           </div>
         </Card>

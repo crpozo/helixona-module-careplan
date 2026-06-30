@@ -14,9 +14,9 @@ html {
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Warm cream/linen background — calming wellness aesthetic. */
-  background-color: #f7f3ea;
-  color: #2a241e;
+  /* Page background — very light slate-blue per STYLE.md §3 */
+  background-color: #f4f6fb;
+  color: #0f172a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -38,14 +38,14 @@ body {
 /* Thin, brand-tinted scrollbars on desktop. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #e6ddcd transparent;
+  scrollbar-color: #e2e8f0 transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: #e6ddcd;
+  background-color: #e2e8f0;
   border-radius: 9999px;
 }
 

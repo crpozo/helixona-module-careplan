@@ -36,8 +36,8 @@ export function PlanPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page hero */}
-      <header>
+      {/* Page hero — visible on mobile; desktop top bar already names the section. */}
+      <header className="lg:hidden">
         <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
           Plan of Care
         </p>

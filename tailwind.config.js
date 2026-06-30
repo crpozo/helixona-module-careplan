@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Brand gold — primary identity (a gentle accent in the wellness look).
+        // Brand gold — primary identity. See STYLE.md §1.
         brand: {
           50: '#faf7f0',
           100: '#f3ebd9',
@@ -17,25 +17,11 @@ export default {
           800: '#7a6234',
           900: '#5a4827',
         },
-        // Ink — warm near-blacks (not pure black) for a softer, premium feel.
+        // Ink / near-black — dark surfaces, sidebar.
         ink: {
-          700: '#3a332b',
-          800: '#2a241e',
-          900: '#1d1813',
-        },
-        // We override the default cool "slate" with a WARM greige scale so every
-        // existing slate-* utility across the app reads warm without per-file edits.
-        slate: {
-          50: '#f8f5ef',
-          100: '#f1ebe0',
-          200: '#e7decd',
-          300: '#d8cdb7',
-          400: '#a99f8c',
-          500: '#83796a',
-          600: '#645b4f',
-          700: '#4b443a',
-          800: '#322e27',
-          900: '#211d18',
+          700: '#1c1c1c',
+          800: '#111111',
+          900: '#000000',
         },
       },
       fontFamily: {
@@ -51,13 +37,10 @@ export default {
         ],
       },
       borderRadius: {
-        // Softer, rounder surfaces for the wellness aesthetic.
-        '2xl': '1.25rem',
-        '3xl': '1.75rem',
+        '2xl': '1rem',
       },
       boxShadow: {
-        soft: '0 1px 2px 0 rgb(70 50 20 / 0.04), 0 6px 20px -8px rgb(70 50 20 / 0.10)',
-        warm: '0 10px 30px -12px rgb(120 90 40 / 0.18)',
+        soft: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
       },
       keyframes: {
         'pop-in': {

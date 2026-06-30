@@ -61,8 +61,8 @@ export function StaffPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page hero */}
-      <header>
+      {/* Page hero — visible on mobile; desktop top bar already names the section. */}
+      <header className="lg:hidden">
         <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
           Staff console
         </p>
@@ -73,32 +73,32 @@ export function StaffPage() {
       </header>
 
       {/* 1) INTRO ----------------------------------------------------------- */}
-      <Card className="border-brand-200 bg-gradient-to-br from-brand-50 to-white">
+      <Card className="border-ink-700/40 bg-ink-900 text-white">
         <div className="flex items-start gap-4">
           <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-ink-900">
             <ClipboardList className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
               ECW → app bridge
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">
+            <p className="mt-1 text-sm leading-relaxed text-slate-300">
               Clinic data entry — author the plan of care and log actual visits from ECW
               for{' '}
-              <span className="font-semibold text-ink-900">
+              <span className="font-semibold text-white">
                 {patient.firstName} {patient.lastName}
               </span>{' '}
               (
-              <span className="tnum font-semibold text-ink-900">
+              <span className="tnum font-semibold text-white">
                 {patient.ecwId ?? '—'}
               </span>
               ).
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Pill tone="brand">{PROGRAM_LABEL[patient.program]}</Pill>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-400">
                 Provider:{' '}
-                <span className="font-semibold text-ink-900">{patient.provider}</span>
+                <span className="font-semibold text-slate-200">{patient.provider}</span>
               </span>
             </div>
           </div>
