@@ -1,10 +1,9 @@
 name: Deploy to GitHub Pages
 
+# Manual-only: the site is served via "Deploy from a branch → main → /docs"
+# (the committed docs/ folder), so GitHub's built-in pages-build-deployment
+# handles auto-deploys. Kept here for optional one-off Actions deploys.
 on:
-  push:
-    branches:
-      - main
-      - claude/ecw-care-plan-app-5st8sv
   workflow_dispatch:
 
 # Allow the GITHUB_TOKEN to deploy to Pages.
@@ -46,7 +45,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./docs
 
   deploy:
     needs: build

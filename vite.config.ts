@@ -15,6 +15,10 @@ export default defineConfig({
     },
   },
   build: {
+    // Output into docs/ so GitHub Pages "Deploy from a branch → main → /docs"
+    // serves the compiled app (the repo root holds the un-built Vite source).
+    outDir: 'docs',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         // STABLE filenames (no content hash). GitHub Pages caches index.html
