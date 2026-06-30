@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Coins } from 'lucide-react'
+import { Coins, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { getIcon } from '@/lib/icons'
 import { num } from '@/lib/format'
@@ -8,15 +9,16 @@ import { Avatar } from '@/components/Avatar'
 import { PATIENT_NAV, STAFF_NAV, ALL_NAV, type NavItem } from '@/components/nav'
 import { useApp, useDerived } from '@/store/store'
 
-function SidebarLink({ item }: { item: NavItem }) {
+function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
   const Icon = getIcon(item.icon)
   return (
     <NavLink
       to={item.to}
       end={item.end}
+      onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
           isActive
             ? 'bg-brand-500 font-semibold text-ink-900'
             : 'text-slate-300 hover:bg-ink-700 hover:text-white',
@@ -93,6 +95,23 @@ export function AppShell() {
   const { state } = useApp()
   const { level } = useDerived()
   const { pathname } = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
+  // Close on Escape while the menu is open.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
+
   const active =
     ALL_NAV.find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to) && n.to !== '/')) ??
     ALL_NAV[0]
@@ -150,8 +169,19 @@ export function AppShell() {
       {/* Main column */}
       <div className="flex min-h-screen flex-1 flex-col lg:pl-60">
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/85 px-4 py-3 backdrop-blur lg:hidden">
-          <Logo />
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-slate-200 bg-white/85 px-4 py-3 backdrop-blur lg:hidden">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-ink-900 transition-colors hover:border-brand-300 hover:text-brand-700"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <Logo />
+          </div>
           <PointsChip />
         </header>
 
@@ -177,6 +207,74 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile slide-in menu */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+        >
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] animate-fade-up flex-col bg-ink-900 p-4 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <Logo dark />
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition-colors hover:bg-ink-700 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-ink-800 p-3">
+              <Avatar firstName={state.patient.firstName} lastName={state.patient.lastName} />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">
+                  {state.patient.firstName} {state.patient.lastName}
+                </p>
+                <p className="truncate text-[11px] text-slate-400">
+                  {state.patient.programLabel}
+                </p>
+              </div>
+            </div>
+
+            <nav className="mt-5 space-y-1">
+              {PATIENT_NAV.map((item) => (
+                <SidebarLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
+              ))}
+            </nav>
+
+            <div className="my-4 border-t border-ink-700" />
+            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Clinic
+            </p>
+            <nav className="space-y-1">
+              {STAFF_NAV.map((item) => (
+                <SidebarLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
+              ))}
+            </nav>
+
+            <div className="mt-auto rounded-xl border border-ink-700 p-3">
+              <div className="flex items-center gap-2 text-brand-500">
+                <TierIcon className="h-4 w-4" />
+                <span className="text-xs font-semibold">{level.tier} tier</span>
+              </div>
+              <p className="mt-1 text-[11px] text-slate-400">
+                {level.nextTier
+                  ? `${num(level.toNext)} pts to ${level.nextTier}`
+                  : 'Top tier reached'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>
