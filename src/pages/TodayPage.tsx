@@ -72,7 +72,8 @@ export function TodayPage() {
 
   const upcoming = d.upcoming.slice(0, 3)
 
-  // Reward nudge: cheapest affordable reward, else progress to cheapest overall.
+  // Reward nudge: the most valuable reward they can already afford (most
+  // enticing "you unlocked this" moment); else progress toward the cheapest.
   const affordable = useMemo<Reward | null>(() => {
     const list = rewards
       .filter((r) => r.cost <= d.points.balance)

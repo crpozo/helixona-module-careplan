@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Plus, Trash2, ClipboardList, AlertTriangle } from 'lucide-react'
 import type {
   Activity,
@@ -527,6 +527,14 @@ function WeeklyLogCard() {
   // Whether the chosen week actually exists in the store.
   const weekExists = weeks.some((w) => w.weekNumber === selectedWeek)
 
+  // If the selected week disappears (e.g. after a demo reset), snap back to the
+  // current week so the picker and the panel can't drift out of sync.
+  useEffect(() => {
+    if (!weeks.some((w) => w.weekNumber === selectedWeek)) {
+      setSelectedWeek(currentWeek)
+    }
+  }, [weeks, currentWeek, selectedWeek])
+
   // Resolve the chosen week (falling back to an empty synthesized log).
   const weekLog = useMemo<WeekLog>(
     () =>
@@ -555,7 +563,15 @@ function WeeklyLogCard() {
       title="Weekly log — ordered vs actual"
       subtitle="Enter the actual completions logged in ECW for the selected week."
       action={
-        <Button variant="secondary" size="sm" onClick={() => actions.addWeek()}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            const next = weeks.reduce((m, w) => Math.max(m, w.weekNumber), 0) + 1
+            actions.addWeek()
+            setSelectedWeek(next)
+          }}
+        >
           <Plus className="h-4 w-4" />
           Add next week
         </Button>
@@ -608,7 +624,9 @@ function WeeklyLogCard() {
       ) : (
         <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-100">
           {adherence.byActivity.map((row) => {
-            const value = weekLog.completions[row.activity.id] ?? 0
+            // Use the clamped actual so the box never shows more than the
+            // ordered max (e.g. after staff lowers an activity's frequency).
+            const value = row.actual
             return (
               <li
                 key={row.activity.id}
