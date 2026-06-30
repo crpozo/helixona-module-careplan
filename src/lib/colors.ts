@@ -4,14 +4,14 @@
 export const COLORS = {
   brand: '#d6b981',
   brandSoft: '#f3ebd9',
-  ink: '#1c1c1c',
+  ink: '#2a241e',
   accent: '#b08d4f',
   emerald: '#22c55e',
   amber: '#f59e0b',
   rose: '#e11d48',
-  slate: '#9ca3af',
-  grid: '#eef2f7',
-  axis: '#94a3b8',
+  slate: '#a99f8c',
+  grid: '#efe7d8',
+  axis: '#a99f8c',
 } as const
 
 // Categorical palette — on-brand gold family, not a rainbow.
@@ -27,10 +27,10 @@ export const CATEGORICAL = [
 // Adherence intensity buckets (mirrors "occupancy intensity" in STYLE.md §6).
 // Returns a hex usable for bars / heat cells.
 export function adherenceColor(pct: number): string {
-  if (pct >= 90) return '#1c1c1c' // black — excellent
+  if (pct >= 90) return '#9c7e44' // deep gold — excellent
   if (pct >= 75) return '#d6b981' // gold — on track
   if (pct >= 50) return '#e8d7b4' // light gold — watch
-  return '#cbd5e1' // slate — behind
+  return '#d8cdb7' // warm sand — behind
 }
 
 // Semantic status -> tailwind chip classes (pill backgrounds).

@@ -88,49 +88,49 @@ export function TodayPage() {
   return (
     <div className="space-y-6">
       {/* 1) GREETING HERO ---------------------------------------------------- */}
-      <section className="animate-fade-up overflow-hidden rounded-2xl border border-ink-700/40 bg-ink-900 text-white shadow-sm">
+      <section className="animate-fade-up overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-50 via-white to-brand-100 shadow-soft">
         <div className="relative p-5 sm:p-7">
           {/* warm gold glow */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl"
+            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-300/40 blur-3xl"
           />
           <div className="relative flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs font-medium uppercase tracking-wide text-brand-300">
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
                 {formatDate(now.toISOString(), {
                   weekday: 'long',
                   month: 'long',
                   day: 'numeric',
                 })}
               </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-                {hello}, <span className="text-brand-400">{patient.firstName}</span>
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
+                {hello}, <span className="text-brand-700">{patient.firstName}</span>
               </h1>
-              <p className="mt-2 max-w-md text-sm text-slate-300">
+              <p className="mt-2 max-w-md text-sm text-slate-600">
                 Your goal:{' '}
-                <span className="font-medium text-white">&ldquo;{plan.goal}&rdquo;</span>
+                <span className="font-semibold text-ink-900">&ldquo;{plan.goal}&rdquo;</span>
               </p>
             </div>
             <Avatar
               firstName={patient.firstName}
               lastName={patient.lastName}
-              size="h-12 w-12 shrink-0 ring-2 ring-brand-500/40"
+              size="h-12 w-12 shrink-0 ring-2 ring-brand-300"
             />
           </div>
 
           {/* context chips */}
           <div className="relative mt-5 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100">
-              <StageIcon className="h-3.5 w-3.5 text-brand-400" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white/70 px-3 py-1 text-xs font-medium text-ink-800">
+              <StageIcon className="h-3.5 w-3.5 text-brand-600" />
               {stage.label}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100">
-              <PacingIcon className="h-3.5 w-3.5 text-brand-400" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white/70 px-3 py-1 text-xs font-medium text-ink-800">
+              <PacingIcon className="h-3.5 w-3.5 text-brand-600" />
               {pacing.label} pace
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100">
-              <Sparkles className="h-3.5 w-3.5 text-brand-400" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white/70 px-3 py-1 text-xs font-medium text-ink-800">
+              <Sparkles className="h-3.5 w-3.5 text-brand-600" />
               {patient.programLabel}
             </span>
           </div>
@@ -311,7 +311,7 @@ export function TodayPage() {
                 const ApptIcon = linked ? getIcon(linked.icon) : CalendarDays
                 return (
                   <li key={appt.id} className="flex items-center gap-3 p-4">
-                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-brand-400">
+                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
                       <ApptIcon className="h-5 w-5" />
                     </span>
                     <div className="min-w-0 flex-1">

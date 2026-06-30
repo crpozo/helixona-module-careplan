@@ -101,8 +101,8 @@ export function ProgressPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page hero — visible on mobile; desktop top bar already names the section. */}
-      <header className="lg:hidden">
+      {/* Page hero */}
+      <header>
         <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
           Progress
         </p>
@@ -113,7 +113,7 @@ export function ProgressPage() {
       </header>
 
       {/* 1) KPI ROW ----------------------------------------------------------- */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <KpiCard
           label="Avg adherence"
           value={pct(avgAdherence)}
@@ -261,7 +261,7 @@ export function ProgressPage() {
                 dataKey="pct"
                 radius={[0, 6, 6, 0]}
                 maxBarSize={22}
-                background={{ fill: '#f1f5f9' }}
+                background={{ fill: '#efe7d8' }}
               >
                 {activityData.map((entry) => (
                   <Cell key={entry.name} fill={adherenceColor(entry.pct)} />

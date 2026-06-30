@@ -77,35 +77,35 @@ export function RewardsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Mobile page title (desktop top bar shows the section name). */}
-      <h1 className="text-lg font-bold text-ink-900 lg:hidden">Rewards</h1>
+      {/* Page title */}
+      <h1 className="text-lg font-bold text-ink-900">Rewards</h1>
 
       {/* 1) POINTS HERO ------------------------------------------------------ */}
-      <section className="animate-fade-up overflow-hidden rounded-2xl border border-ink-700/40 bg-ink-900 text-white shadow-sm">
+      <section className="animate-fade-up overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-100 via-brand-50 to-white shadow-soft">
         <div className="relative p-5 sm:p-7">
           {/* warm gold glow */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-20 -top-24 h-60 w-60 rounded-full bg-brand-500/25 blur-3xl"
+            className="pointer-events-none absolute -right-20 -top-24 h-60 w-60 rounded-full bg-brand-300/40 blur-3xl"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-24 -left-16 h-52 w-52 rounded-full bg-brand-500/10 blur-3xl"
+            className="pointer-events-none absolute -bottom-24 -left-16 h-52 w-52 rounded-full bg-brand-200/40 blur-3xl"
           />
 
           <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
-              <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-brand-300">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand-700">
                 <Coins className="h-4 w-4" />
                 Your balance
               </p>
               <p className="mt-2 flex items-baseline gap-2">
-                <span className="text-3xl font-bold tracking-tight text-brand-400 tnum sm:text-4xl">
+                <span className="text-4xl font-bold tracking-tight text-brand-700 tnum sm:text-5xl">
                   {num(balance)}
                 </span>
-                <span className="text-sm font-medium text-slate-300">points</span>
+                <span className="text-sm font-medium text-slate-500">points</span>
               </p>
-              <p className="mt-2 text-sm text-slate-400">
+              <p className="mt-2 text-sm text-slate-600">
                 Earn points by completing your plan each week.
               </p>
 
@@ -115,7 +115,7 @@ export function RewardsPage() {
                   <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
                     Lifetime
                   </p>
-                  <p className="text-sm font-semibold text-white tnum">
+                  <p className="text-sm font-semibold text-ink-900 tnum">
                     {num(d.points.lifetime)}
                   </p>
                 </div>
@@ -123,7 +123,7 @@ export function RewardsPage() {
                   <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
                     Spent
                   </p>
-                  <p className="text-sm font-semibold text-white tnum">
+                  <p className="text-sm font-semibold text-ink-900 tnum">
                     {num(d.points.spent)}
                   </p>
                 </div>
@@ -131,7 +131,7 @@ export function RewardsPage() {
                   <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
                     This week
                   </p>
-                  <p className="text-sm font-semibold text-emerald-400 tnum">
+                  <p className="text-sm font-semibold text-emerald-600 tnum">
                     +{num(d.points.thisWeek)}
                   </p>
                 </div>
@@ -139,16 +139,16 @@ export function RewardsPage() {
             </div>
 
             {/* Tier card */}
-            <div className="w-full shrink-0 rounded-xl border border-white/10 bg-white/5 p-4 sm:w-64">
+            <div className="w-full shrink-0 rounded-2xl border border-brand-200 bg-white/80 p-4 shadow-soft sm:w-64">
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-ink-900">
                   <LevelIcon className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-brand-300">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-brand-700">
                     Tier {d.level.index} of {d.level.total}
                   </p>
-                  <p className="text-base font-bold tracking-tight text-white">
+                  <p className="text-base font-bold tracking-tight text-ink-900">
                     {d.level.tier}
                   </p>
                 </div>
@@ -158,19 +158,19 @@ export function RewardsPage() {
                 <ProgressBar
                   value={d.level.progress * 100}
                   color="#d6b981"
-                  trackClassName="bg-white/10"
+                  trackClassName="bg-brand-100"
                   height={8}
                 />
-                <p className="mt-2 text-[11px] font-medium text-slate-300">
+                <p className="mt-2 text-[11px] font-medium text-slate-500">
                   {d.level.nextTier ? (
                     <>
-                      <span className="font-semibold text-brand-300 tnum">
+                      <span className="font-semibold text-brand-700 tnum">
                         {num(d.level.toNext)}
                       </span>{' '}
                       pts to {d.level.nextTier}
                     </>
                   ) : (
-                    <span className="font-semibold text-brand-300">Top tier — radiant!</span>
+                    <span className="font-semibold text-brand-700">Top tier — radiant!</span>
                   )}
                 </p>
               </div>
@@ -232,7 +232,7 @@ export function RewardsPage() {
         title="Redeem your points"
         subtitle="Treat yourself — gift cards, free sessions and members-only perks."
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {rewards.map((reward) => {
             const RewardIcon = getIcon(reward.icon)
             const affordable = balance >= reward.cost
@@ -358,7 +358,7 @@ export function RewardsPage() {
           subtitle={`${d.earnedBadges.length} of ${d.badges.length} earned`}
         />
         <Card>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {d.badges.map((badge) => {
               const BadgeIcon = getIcon(badge.icon)
               const tone = BADGE_TONE[badge.tone] ?? BADGE_TONE.brand
