@@ -14,6 +14,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // STABLE filenames (no content hash). GitHub Pages caches index.html
+        // for ~10 min; with hashed names a redeploy deletes the old chunks and
+        // a cached index.html 404s -> blank page. Stable names mean a cached
+        // index.html always resolves to files that still exist.
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
+  },
   server: {
     port: 5173,
     host: true,
