@@ -30,6 +30,8 @@ const ADJUST_ACTIONS: { icon: string; label: string; to: string }[] = [
 export function TodayPage() {
   const { state } = useApp()
   const d = useDerived()
+  const isStaff = state.role === 'staff'
+  const quickActions = isStaff ? ADJUST_ACTIONS : ADJUST_ACTIONS.filter((a) => a.to !== '/staff')
 
   const now = useMemo(() => new Date(), [])
   const hello = greeting(now)
@@ -91,11 +93,13 @@ export function TodayPage() {
           <Button variant="secondary" size="sm" className="cursor-default tnum" tabIndex={-1}>
             Week {num(state.currentWeek)}
           </Button>
-          <Link to="/staff">
-            <Button variant="secondary" size="sm">
-              Adjust
-            </Button>
-          </Link>
+          {isStaff && (
+            <Link to="/staff">
+              <Button variant="secondary" size="sm">
+                Adjust
+              </Button>
+            </Link>
+          )}
           <Link to="/week">
             <Button size="sm">Log activity</Button>
           </Link>
@@ -258,9 +262,9 @@ export function TodayPage() {
         </Card>
 
         {/* c) Adjust your plan */}
-        <Card title="Adjust your plan" subtitle="Quick links">
+        <Card title={isStaff ? 'Adjust your plan' : 'Quick links'} subtitle="Jump to">
           <ul className="space-y-2">
-            {ADJUST_ACTIONS.map(({ icon, label, to }) => (
+            {quickActions.map(({ icon, label, to }) => (
               <li key={to}>
                 <Link
                   to={to}

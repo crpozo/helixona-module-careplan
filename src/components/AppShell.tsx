@@ -8,6 +8,7 @@ import { Logo } from '@/components/Logo'
 import { Avatar } from '@/components/Avatar'
 import { PATIENT_NAV, STAFF_NAV, type NavItem } from '@/components/nav'
 import { useApp, useDerived } from '@/store/store'
+import type { UserRole } from '@/types'
 
 function HelixGlyph({ className }: { className?: string }) {
   return (
@@ -40,6 +41,43 @@ function PointsChip() {
         {level.tier}
       </span>
     </NavLink>
+  )
+}
+
+/** Patient/Staff role switcher (demo: simulates the two distinct users). */
+function RoleSwitch({
+  role,
+  onChange,
+  className,
+}: {
+  role: UserRole
+  onChange: (r: UserRole) => void
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] p-0.5 text-xs font-semibold',
+        className,
+      )}
+      role="group"
+      aria-label="Switch user role"
+    >
+      {(['patient', 'staff'] as const).map((r) => (
+        <button
+          key={r}
+          type="button"
+          onClick={() => onChange(r)}
+          aria-pressed={role === r}
+          className={cn(
+            'rounded-full px-3 py-1 transition-colors',
+            role === r ? 'bg-brand-500 text-ink-900' : 'text-slate-400 hover:text-white',
+          )}
+        >
+          {r === 'staff' ? 'Staff' : 'Patient'}
+        </button>
+      ))}
+    </div>
   )
 }
 
@@ -112,8 +150,9 @@ function DrawerLink({ item, onNavigate }: { item: NavItem; onNavigate: () => voi
 }
 
 export function AppShell() {
-  const { state } = useApp()
+  const { state, actions } = useApp()
   const { level } = useDerived()
+  const isStaff = state.role === 'staff'
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const TierIcon = getIcon(level.icon)
@@ -147,11 +186,13 @@ export function AppShell() {
             <RailIcon key={item.to} item={item} />
           ))}
         </nav>
-        <nav className="flex flex-col items-center gap-2 border-t border-white/5 pt-3">
-          {STAFF_NAV.map((item) => (
-            <RailIcon key={item.to} item={item} />
-          ))}
-        </nav>
+        {isStaff && (
+          <nav className="flex flex-col items-center gap-2 border-t border-white/5 pt-3">
+            {STAFF_NAV.map((item) => (
+              <RailIcon key={item.to} item={item} />
+            ))}
+          </nav>
+        )}
       </aside>
 
       {/* Main column */}
@@ -181,6 +222,11 @@ export function AppShell() {
             </nav>
 
             <div className="ml-auto flex items-center gap-2.5">
+              <RoleSwitch
+                role={state.role}
+                onChange={actions.setRole}
+                className="hidden md:inline-flex"
+              />
               <PointsChip />
               <Avatar
                 firstName={state.patient.firstName}
@@ -231,21 +277,32 @@ export function AppShell() {
               </div>
             </div>
 
+            <div className="mt-5">
+              <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                Viewing as
+              </p>
+              <RoleSwitch role={state.role} onChange={actions.setRole} className="w-full justify-center" />
+            </div>
+
             <nav className="mt-5 space-y-1">
               {PATIENT_NAV.map((item) => (
                 <DrawerLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
               ))}
             </nav>
 
-            <div className="my-4 border-t border-white/5" />
-            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              Clinic
-            </p>
-            <nav className="space-y-1">
-              {STAFF_NAV.map((item) => (
-                <DrawerLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
-              ))}
-            </nav>
+            {isStaff && (
+              <>
+                <div className="my-4 border-t border-white/5" />
+                <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Clinic
+                </p>
+                <nav className="space-y-1">
+                  {STAFF_NAV.map((item) => (
+                    <DrawerLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
+                  ))}
+                </nav>
+              </>
+            )}
 
             <div className="mt-auto rounded-xl border border-white/5 bg-white/[0.03] p-3">
               <div className="flex items-center gap-2 text-brand-300">

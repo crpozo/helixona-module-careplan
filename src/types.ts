@@ -149,6 +149,12 @@ export interface Appointment {
 
 export type ProgramKey = 'wellness' | 'chronic' | 'neuro'
 
+/**
+ * Who is using the app. The patient can view and track their plan; only a
+ * clinic employee (staff) can edit/modify the plan of care.
+ */
+export type UserRole = 'patient' | 'staff'
+
 export interface Patient {
   id: string
   firstName: string
@@ -176,6 +182,8 @@ export interface CarePlan {
 
 /** The full persisted application state (single patient context). */
 export interface AppState {
+  /** Current viewer. Patients can't edit the plan; staff can. */
+  role: UserRole
   patient: Patient
   plan: CarePlan
   weeks: WeekLog[]

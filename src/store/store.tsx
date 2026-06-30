@@ -13,6 +13,7 @@ import type {
   Pacing,
   Redemption,
   StageKey,
+  UserRole,
 } from '@/types'
 import { createSeedState } from '@/data/seed'
 import { clamp } from '@/lib/format'
@@ -45,6 +46,7 @@ type Action =
   | { type: 'ADD_WEEK' }
   | { type: 'SET_WEEK_NOTE'; weekNumber: number; note: string }
   | { type: 'SET_ADHERENCE_TARGET'; value: number }
+  | { type: 'SET_ROLE'; role: UserRole }
   | { type: 'RESET' }
 
 function orderedFor(state: AppState, activityId: string): number {
@@ -177,8 +179,10 @@ function reducer(state: AppState, action: Action): AppState {
       }
     case 'SET_ADHERENCE_TARGET':
       return { ...state, adherenceTarget: clamp(Math.round(action.value), 10, 100) }
+    case 'SET_ROLE':
+      return { ...state, role: action.role }
     case 'RESET':
-      return createSeedState()
+      return { ...createSeedState(), role: state.role }
     default:
       return state
   }
@@ -196,7 +200,8 @@ function loadState(): AppState {
     if (!parsed.patient || !parsed.plan || !Array.isArray(parsed.weeks)) {
       return createSeedState()
     }
-    return parsed as AppState
+    // Migrate older saves that predate the role field.
+    return { ...(parsed as AppState), role: parsed.role ?? 'patient' }
   } catch {
     return createSeedState()
   }
@@ -248,6 +253,7 @@ function makeActions(state: AppState, dispatch: React.Dispatch<Action>) {
       dispatch({ type: 'SET_WEEK_NOTE', weekNumber, note }),
     setAdherenceTarget: (value: number) =>
       dispatch({ type: 'SET_ADHERENCE_TARGET', value }),
+    setRole: (role: UserRole) => dispatch({ type: 'SET_ROLE', role }),
     reset: () => dispatch({ type: 'RESET' }),
   }
 }

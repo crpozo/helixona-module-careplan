@@ -1,6 +1,6 @@
-import { lazy, Suspense } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
-import { AppProvider } from '@/store/store'
+import { lazy, Suspense, type ReactNode } from 'react'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AppProvider, useApp } from '@/store/store'
 import { AppShell } from '@/components/AppShell'
 import { TodayPage } from '@/pages/TodayPage'
 
@@ -29,6 +29,13 @@ function RouteFallback() {
       <span className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
     </div>
   )
+}
+
+/** Only clinic staff may edit the plan; patients are redirected home. */
+function RequireStaff({ children }: { children: ReactNode }) {
+  const { state } = useApp()
+  if (state.role !== 'staff') return <Navigate to="/" replace />
+  return <>{children}</>
 }
 
 export function App() {
@@ -73,9 +80,11 @@ export function App() {
             <Route
               path="staff"
               element={
-                <Suspense fallback={<RouteFallback />}>
-                  <StaffPage />
-                </Suspense>
+                <RequireStaff>
+                  <Suspense fallback={<RouteFallback />}>
+                    <StaffPage />
+                  </Suspense>
+                </RequireStaff>
               }
             />
             <Route path="*" element={<TodayPage />} />
