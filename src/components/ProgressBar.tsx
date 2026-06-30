@@ -21,7 +21,7 @@ export function ProgressBar({
   const clamped = Math.max(0, Math.min(100, value))
   return (
     <div
-      className={cn('w-full overflow-hidden rounded-full bg-slate-100', trackClassName, className)}
+      className={cn('w-full overflow-hidden rounded-full bg-white/10', trackClassName, className)}
       style={{ height }}
       role="progressbar"
       aria-valuenow={Math.round(clamped)}

@@ -5,8 +5,8 @@ import { useApp, useDerived } from '@/store/store'
 import { LOCATION_LABEL } from '@/lib/plan'
 import { addDays, formatShortDate, num, pct, plural } from '@/lib/format'
 import { adherenceColor } from '@/lib/colors'
-import { getIcon } from '@/lib/icons'
 import { Card } from '@/components/Card'
+import { IconChip } from '@/components/IconChip'
 import { Pill } from '@/components/Pill'
 import { ProgressRing } from '@/components/ProgressRing'
 import { ProgressBar } from '@/components/ProgressBar'
@@ -67,14 +67,14 @@ export function WeekPage() {
     <div className="space-y-6">
       {/* 1) WEEK HEADER --------------------------------------------------- */}
       <div className="lg:hidden">
-        <h1 className="text-lg font-bold text-ink-900">This Week</h1>
+        <h1 className="text-lg font-bold text-white">This Week</h1>
         <p className="text-sm text-slate-400">Check off everything you do this week.</p>
       </div>
 
       <Card className="animate-fade-up">
         <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
           <ProgressRing value={adherence.pct} size={132} stroke={12} color={ringColor}>
-            <span className="text-3xl font-bold tracking-tight text-ink-900 tnum">
+            <span className="text-3xl font-bold tracking-tight text-white tnum">
               {pct(adherence.pct)}
             </span>
             <span className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-400">
@@ -84,7 +84,7 @@ export function WeekPage() {
 
           <div className="w-full flex-1 text-center sm:text-left">
             <div className="flex items-center justify-center gap-2 sm:justify-start">
-              <h2 className="text-lg font-bold text-ink-900 tnum">Week {currentWeek}</h2>
+              <h2 className="text-lg font-bold text-white tnum">Week {currentWeek}</h2>
               <Pill tone={status.tone}>{status.label}</Pill>
             </div>
             <p className="mt-0.5 text-xs font-medium uppercase tracking-wide text-slate-400 tnum">
@@ -97,24 +97,24 @@ export function WeekPage() {
                 <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                   Activities
                 </p>
-                <p className="text-xl font-bold tracking-tight text-ink-900 tnum">
+                <p className="text-xl font-bold tracking-tight text-white tnum">
                   {adherence.actual}
-                  <span className="text-slate-300">/</span>
+                  <span className="text-slate-500">/</span>
                   {adherence.ordered}
                 </p>
               </div>
-              <div className="h-9 w-px bg-slate-200" />
+              <div className="h-9 w-px bg-white/10" />
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                   Points this week
                 </p>
-                <p className="flex items-center gap-1.5 text-xl font-bold tracking-tight text-brand-700 tnum">
-                  <Coins className="h-4 w-4 text-brand-600" />+{num(d.points.thisWeek)}
+                <p className="flex items-center gap-1.5 text-xl font-bold tracking-tight text-brand-300 tnum">
+                  <Coins className="h-4 w-4 text-brand-300" />+{num(d.points.thisWeek)}
                 </p>
               </div>
             </div>
 
-            <p className="mt-3 text-sm text-slate-500">
+            <p className="mt-3 text-sm text-slate-400">
               {encouragement(adherence.pct, state.adherenceTarget)}
             </p>
           </div>
@@ -147,7 +147,7 @@ export function WeekPage() {
                 }
               />
               <Card flush>
-                <ul className="divide-y divide-slate-100">
+                <ul className="divide-y divide-white/5">
                   {rows.map((row) => (
                     <ActivityRow
                       key={row.activity.id}
@@ -165,7 +165,7 @@ export function WeekPage() {
 
       {/* 3) TOTAL SUMMARY ------------------------------------------------- */}
       {hasActivities && (
-        <Card className="border-ink-700/40 bg-ink-900 text-white">
+        <Card className="border-brand-500/20 bg-gradient-to-br from-brand-500/12 to-transparent text-white">
           <div className="flex items-center gap-4">
             <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-ink-900">
               <Check className="h-5 w-5" />
@@ -239,22 +239,16 @@ function ActivityRow({
   onRemove: () => void
 }) {
   const { activity, ordered, actual, pct: pctVal } = row
-  const Icon = getIcon(activity.icon)
   const done = actual >= ordered
   const barColor = adherenceColor(pctVal)
 
   return (
     <li className="flex items-center gap-3 p-4 sm:gap-4">
-      <span
-        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700"
-        aria-hidden
-      >
-        <Icon className="h-5 w-5" />
-      </span>
+      <IconChip icon={activity.icon} size="h-11 w-11" iconClassName="h-5 w-5" />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-semibold text-ink-900">{activity.name}</p>
+          <p className="truncate text-sm font-semibold text-white">{activity.name}</p>
           {done && (
             <Pill tone="good" className="shrink-0">
               <Check className="h-3 w-3" />
@@ -264,9 +258,9 @@ function ActivityRow({
         </div>
         <div className="mt-2 flex items-center gap-3">
           <ProgressBar value={pctVal} color={barColor} className="max-w-[160px] flex-1" />
-          <span className="shrink-0 text-xs font-medium text-slate-500 tnum">
+          <span className="shrink-0 text-xs font-medium text-slate-400 tnum">
             {/* key on actual remounts the count so it pops on each change */}
-            <span key={actual} className="inline-block animate-pop-in font-semibold text-ink-900">
+            <span key={actual} className="inline-block animate-pop-in font-semibold text-white">
               {actual}
             </span>{' '}
             / {ordered}

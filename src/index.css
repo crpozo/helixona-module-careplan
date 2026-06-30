@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html {
@@ -14,14 +14,44 @@ html {
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Page background — very light slate-blue per STYLE.md §3 */
-  background-color: #f4f6fb;
-  color: #0f172a;
+  /* Near-black base with subtle warm-gold glows (see #app-bg). */
+  background-color: #0a0a0b;
+  color: #e7e5e4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Respect iOS safe areas for the mobile bottom nav. */
+/* Ambient gold glow blobs behind the whole app (fixed, non-interactive). */
+.app-bg::before,
+.app-bg::after {
+  content: '';
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 9999px;
+  filter: blur(120px);
+}
+.app-bg::before {
+  top: -10rem;
+  right: -6rem;
+  height: 28rem;
+  width: 28rem;
+  background: radial-gradient(circle, rgba(214, 185, 129, 0.18), transparent 70%);
+}
+.app-bg::after {
+  bottom: -12rem;
+  left: 2rem;
+  height: 26rem;
+  width: 26rem;
+  background: radial-gradient(circle, rgba(214, 185, 129, 0.08), transparent 70%);
+}
+
+/* Tabular numbers for metric alignment. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -29,33 +59,27 @@ body {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* Tabular numbers for KPI / metric alignment (STYLE.md §2). */
-.tnum {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum';
-}
-
-/* Thin, brand-tinted scrollbars on desktop. */
+/* Thin dark scrollbars. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
 }
 
-/* Shimmer used by gift-card / reward highlights. */
-.shimmer-gold {
-  background-image: linear-gradient(
-    100deg,
-    #d6b981 0%,
-    #f3ebd9 30%,
-    #d6b981 60%
-  );
-  background-size: 200% 100%;
+/* Glassy dark card surface used across the app. */
+.glass {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(6px);
+}
+.glass-hover:hover {
+  background-color: rgba(255, 255, 255, 0.055);
+  border-color: rgba(214, 185, 129, 0.35);
 }

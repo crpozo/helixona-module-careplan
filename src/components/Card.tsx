@@ -12,22 +12,20 @@ interface CardProps {
   children?: ReactNode
 }
 
-/** The default container. STYLE.md §4. */
+/** The default glassy dark container. */
 export function Card({ title, subtitle, action, className, flush, children }: CardProps) {
   const hasHeader = title || subtitle || action
-  // Tailwind utilities don't override by class-string order, so when a caller
-  // supplies their own surface (e.g. a dark `bg-ink-900` card) we must DROP the
-  // defaults rather than emit both and let CSS ordering decide.
   const cls = className ?? ''
   const overridesBg = /(?:^|\s)bg-/.test(cls)
-  const overridesBorder =
-    /(?:^|\s)border-(?:slate|ink|brand|white|black|emerald|rose|amber|transparent)/.test(cls)
+  const overridesBorder = /(?:^|\s)border-\[|(?:^|\s)border-(?:slate|ink|brand|white|black|emerald|rose|amber|transparent)/.test(
+    cls,
+  )
   return (
     <section
       className={cn(
-        'rounded-2xl border shadow-sm',
-        !overridesBg && 'bg-white',
-        !overridesBorder && 'border-slate-200',
+        'rounded-2xl border backdrop-blur',
+        !overridesBg && 'bg-white/[0.03]',
+        !overridesBorder && 'border-white/[0.07]',
         flush ? '' : 'p-5',
         className,
       )}
@@ -41,12 +39,8 @@ export function Card({ title, subtitle, action, className, flush, children }: Ca
           )}
         >
           <div className="min-w-0">
-            {title ? (
-              <h2 className="text-sm font-semibold text-ink-900">{title}</h2>
-            ) : null}
-            {subtitle ? (
-              <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
-            ) : null}
+            {title ? <h2 className="text-sm font-semibold text-white">{title}</h2> : null}
+            {subtitle ? <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p> : null}
           </div>
           {action && <div className="shrink-0">{action}</div>}
         </header>

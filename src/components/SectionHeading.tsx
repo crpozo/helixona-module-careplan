@@ -15,7 +15,7 @@ export function SectionHeading({ icon, title, subtitle, action }: SectionHeading
       <div className="flex items-center gap-2.5">
         {icon && <IconChip icon={icon} size="h-8 w-8" />}
         <div>
-          <h2 className="text-sm font-semibold text-ink-900">{title}</h2>
+          <h2 className="text-base font-semibold text-white">{title}</h2>
           {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
         </div>
       </div>

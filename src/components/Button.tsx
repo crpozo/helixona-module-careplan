@@ -11,12 +11,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<Variant, string> = {
-  // Gold w/ black text for contrast. STYLE.md §4.
-  primary: 'bg-brand-500 text-ink-900 hover:bg-brand-400 disabled:bg-brand-200',
+  // Gold w/ black text — the bright CTA on dark.
+  primary: 'bg-brand-500 text-ink-900 hover:bg-brand-400 disabled:opacity-50',
   secondary:
-    'border border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-700',
-  ghost: 'text-slate-500 hover:bg-slate-100 hover:text-ink-900',
-  dark: 'bg-ink-900 text-white hover:bg-ink-700',
+    'border border-white/10 bg-white/[0.04] text-slate-200 hover:border-brand-500/40 hover:text-brand-300',
+  ghost: 'text-slate-300 hover:bg-white/5 hover:text-white',
+  dark: 'border border-white/10 bg-white/[0.06] text-white hover:bg-white/10',
 }
 
 const SIZES: Record<Size, string> = {

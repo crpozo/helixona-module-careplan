@@ -6,28 +6,20 @@ import { getIcon } from '@/lib/icons'
 import { num } from '@/lib/format'
 import { Logo } from '@/components/Logo'
 import { Avatar } from '@/components/Avatar'
-import { PATIENT_NAV, STAFF_NAV, ALL_NAV, type NavItem } from '@/components/nav'
+import { PATIENT_NAV, STAFF_NAV, type NavItem } from '@/components/nav'
 import { useApp, useDerived } from '@/store/store'
 
-function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
-  const Icon = getIcon(item.icon)
+function HelixGlyph({ className }: { className?: string }) {
   return (
-    <NavLink
-      to={item.to}
-      end={item.end}
-      onClick={onNavigate}
-      className={({ isActive }) =>
-        cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
-          isActive
-            ? 'bg-brand-500 font-semibold text-ink-900'
-            : 'text-slate-300 hover:bg-ink-700 hover:text-white',
-        )
-      }
-    >
-      <Icon className="h-4 w-4 shrink-0" />
-      <span>{item.label}</span>
-    </NavLink>
+    <svg viewBox="0 0 64 64" className={className} aria-hidden>
+      <path
+        d="M20 14c10 6 14 12 14 18s-4 12-14 18M44 14c-10 6-14 12-14 18s4 12 14 18"
+        fill="none"
+        stroke="#d6b981"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+    </svg>
   )
 }
 
@@ -37,13 +29,13 @@ function PointsChip() {
   return (
     <NavLink
       to="/rewards"
-      className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:border-brand-400"
       title={`${level.tier} tier`}
+      className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1.5 text-xs font-semibold text-brand-300 transition-colors hover:border-brand-500/60"
     >
       <Coins className="h-3.5 w-3.5" />
       <span className="tnum">{num(points.balance)}</span>
-      <span className="hidden text-brand-600 sm:inline">pts</span>
-      <span className="ml-1 hidden items-center gap-1 border-l border-brand-200 pl-2 text-brand-600 sm:inline-flex">
+      <span className="hidden text-brand-400/80 sm:inline">pts</span>
+      <span className="ml-1 hidden items-center gap-1 border-l border-brand-500/20 pl-2 text-brand-400 sm:inline-flex">
         <TierIcon className="h-3.5 w-3.5" />
         {level.tier}
       </span>
@@ -51,43 +43,71 @@ function PointsChip() {
   )
 }
 
-function BottomNav() {
+/** Icon-only nav button for the left rail. */
+function RailIcon({ item }: { item: NavItem }) {
+  const Icon = getIcon(item.icon)
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur safe-bottom lg:hidden">
-      <ul className="mx-auto flex max-w-lg items-stretch justify-between px-1">
-        {PATIENT_NAV.map((item) => {
-          const Icon = getIcon(item.icon)
-          return (
-            <li key={item.to} className="flex-1">
-              <NavLink
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  cn(
-                    'flex flex-col items-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors',
-                    isActive ? 'text-brand-700' : 'text-slate-400',
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <span
-                      className={cn(
-                        'flex h-7 w-12 items-center justify-center rounded-full transition-colors',
-                        isActive && 'bg-brand-100',
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    {item.label}
-                  </>
-                )}
-              </NavLink>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
+    <NavLink
+      to={item.to}
+      end={item.end}
+      title={item.label}
+      aria-label={item.label}
+      className={({ isActive }) =>
+        cn(
+          'flex h-11 w-11 items-center justify-center rounded-2xl transition-colors',
+          isActive
+            ? 'bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/40'
+            : 'text-slate-500 hover:bg-white/5 hover:text-white',
+        )
+      }
+    >
+      <Icon className="h-5 w-5" />
+    </NavLink>
+  )
+}
+
+/** Labelled pill nav item for the top bar. */
+function TopPill({ item }: { item: NavItem }) {
+  const Icon = getIcon(item.icon)
+  return (
+    <NavLink
+      to={item.to}
+      end={item.end}
+      className={({ isActive }) =>
+        cn(
+          'inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+          isActive
+            ? 'bg-white/10 text-brand-300 ring-1 ring-white/10'
+            : 'text-slate-400 hover:text-white',
+        )
+      }
+    >
+      <Icon className="h-4 w-4" />
+      {item.label}
+    </NavLink>
+  )
+}
+
+/** Full-width nav row used inside the mobile drawer. */
+function DrawerLink({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
+  const Icon = getIcon(item.icon)
+  return (
+    <NavLink
+      to={item.to}
+      end={item.end}
+      onClick={onNavigate}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
+          isActive
+            ? 'bg-brand-500/15 font-semibold text-brand-300 ring-1 ring-brand-500/30'
+            : 'text-slate-300 hover:bg-white/5 hover:text-white',
+        )
+      }
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      <span>{item.label}</span>
+    </NavLink>
   )
 }
 
@@ -96,13 +116,12 @@ export function AppShell() {
   const { level } = useDerived()
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
+  const TierIcon = getIcon(level.icon)
 
-  // Close the mobile menu whenever the route changes.
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
 
-  // Close on Escape while the menu is open.
   useEffect(() => {
     if (!menuOpen) return
     const onKey = (e: KeyboardEvent) => {
@@ -112,98 +131,67 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', onKey)
   }, [menuOpen])
 
-  const active =
-    ALL_NAV.find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to) && n.to !== '/')) ??
-    ALL_NAV[0]
-  const TierIcon = getIcon(level.icon)
-
   return (
-    <div className="min-h-screen lg:flex">
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col bg-ink-900 p-4 lg:flex">
-        <div className="px-2 py-2">
-          <Logo dark />
-        </div>
-
-        <div className="mt-4 flex items-center gap-3 rounded-xl bg-ink-800 p-3">
-          <Avatar firstName={state.patient.firstName} lastName={state.patient.lastName} />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">
-              {state.patient.firstName} {state.patient.lastName}
-            </p>
-            <p className="truncate text-[11px] text-slate-400">
-              {state.patient.programLabel}
-            </p>
-          </div>
-        </div>
-
-        <nav className="mt-5 space-y-1">
+    <div className="app-bg relative min-h-screen">
+      {/* Desktop left icon rail */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center gap-2 border-r border-white/5 bg-black/40 py-5 backdrop-blur lg:flex">
+        <NavLink
+          to="/"
+          aria-label="Helixona home"
+          className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/15 ring-1 ring-brand-500/30"
+        >
+          <HelixGlyph className="h-5 w-5" />
+        </NavLink>
+        <nav className="flex flex-1 flex-col items-center gap-2">
           {PATIENT_NAV.map((item) => (
-            <SidebarLink key={item.to} item={item} />
+            <RailIcon key={item.to} item={item} />
           ))}
         </nav>
-
-        <div className="my-4 border-t border-ink-700" />
-        <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          Clinic
-        </p>
-        <nav className="space-y-1">
+        <nav className="flex flex-col items-center gap-2 border-t border-white/5 pt-3">
           {STAFF_NAV.map((item) => (
-            <SidebarLink key={item.to} item={item} />
+            <RailIcon key={item.to} item={item} />
           ))}
         </nav>
-
-        <div className="mt-auto rounded-xl border border-ink-700 p-3">
-          <div className="flex items-center gap-2 text-brand-500">
-            <TierIcon className="h-4 w-4" />
-            <span className="text-xs font-semibold">{level.tier} tier</span>
-          </div>
-          <p className="mt-1 text-[11px] text-slate-400">
-            {level.nextTier
-              ? `${num(level.toNext)} pts to ${level.nextTier}`
-              : 'Top tier reached'}
-          </p>
-        </div>
       </aside>
 
       {/* Main column */}
-      <div className="flex min-h-screen flex-1 flex-col lg:pl-60">
-        {/* Mobile top bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-slate-200 bg-white/85 px-4 py-3 backdrop-blur lg:hidden">
-          <div className="flex items-center gap-2">
+      <div className="relative z-10 flex min-h-screen flex-col lg:pl-[76px]">
+        {/* Top header */}
+        <header className="sticky top-0 z-20 border-b border-white/5 bg-black/40 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 lg:px-8">
+            {/* Mobile: hamburger + logo */}
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
               aria-expanded={menuOpen}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-ink-900 transition-colors hover:border-brand-300 hover:text-brand-700"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white transition-colors hover:border-brand-500/40 hover:text-brand-300 lg:hidden"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <Logo />
+            <div className="lg:hidden">
+              <Logo />
+            </div>
+
+            {/* Desktop: pill nav */}
+            <nav className="hidden items-center gap-1 rounded-full border border-white/5 bg-white/[0.03] p-1 lg:flex">
+              {PATIENT_NAV.map((item) => (
+                <TopPill key={item.to} item={item} />
+              ))}
+            </nav>
+
+            <div className="ml-auto flex items-center gap-2.5">
+              <PointsChip />
+              <Avatar
+                firstName={state.patient.firstName}
+                lastName={state.patient.lastName}
+                size="h-9 w-9"
+              />
+            </div>
           </div>
-          <PointsChip />
         </header>
 
-        {/* Desktop header */}
-        <header className="sticky top-0 z-20 hidden items-center justify-between border-b border-slate-200 bg-white/80 px-8 py-4 backdrop-blur lg:flex">
-          <div>
-            <h1 className="text-lg font-bold text-ink-900">{active.label}</h1>
-            {active.subtitle && (
-              <p className="text-xs text-slate-400">{active.subtitle}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <PointsChip />
-            <Avatar
-              firstName={state.patient.firstName}
-              lastName={state.patient.lastName}
-              size="h-9 w-9"
-            />
-          </div>
-        </header>
-
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 pb-safe-nav lg:px-8 lg:py-7 lg:pb-10">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:px-8">
           <Outlet />
         </main>
       </div>
@@ -217,66 +205,60 @@ export function AppShell() {
           aria-label="Navigation menu"
         >
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] animate-fade-up flex-col bg-ink-900 p-4 shadow-2xl">
+          <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] animate-fade-up flex-col border-r border-white/10 bg-[#0c0c0e] p-4 shadow-2xl">
             <div className="flex items-center justify-between">
-              <Logo dark />
+              <Logo />
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition-colors hover:bg-ink-700 hover:text-white"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-ink-800 p-3">
+            <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] p-3">
               <Avatar firstName={state.patient.firstName} lastName={state.patient.lastName} />
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-white">
                   {state.patient.firstName} {state.patient.lastName}
                 </p>
-                <p className="truncate text-[11px] text-slate-400">
-                  {state.patient.programLabel}
-                </p>
+                <p className="truncate text-[11px] text-slate-400">{state.patient.programLabel}</p>
               </div>
             </div>
 
             <nav className="mt-5 space-y-1">
               {PATIENT_NAV.map((item) => (
-                <SidebarLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
+                <DrawerLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
               ))}
             </nav>
 
-            <div className="my-4 border-t border-ink-700" />
+            <div className="my-4 border-t border-white/5" />
             <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
               Clinic
             </p>
             <nav className="space-y-1">
               {STAFF_NAV.map((item) => (
-                <SidebarLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
+                <DrawerLink key={item.to} item={item} onNavigate={() => setMenuOpen(false)} />
               ))}
             </nav>
 
-            <div className="mt-auto rounded-xl border border-ink-700 p-3">
-              <div className="flex items-center gap-2 text-brand-500">
+            <div className="mt-auto rounded-xl border border-white/5 bg-white/[0.03] p-3">
+              <div className="flex items-center gap-2 text-brand-300">
                 <TierIcon className="h-4 w-4" />
                 <span className="text-xs font-semibold">{level.tier} tier</span>
               </div>
               <p className="mt-1 text-[11px] text-slate-400">
-                {level.nextTier
-                  ? `${num(level.toNext)} pts to ${level.nextTier}`
-                  : 'Top tier reached'}
+                {level.nextTier ? `${num(level.toNext)} pts to ${level.nextTier}` : 'Top tier reached'}
               </p>
             </div>
           </div>
         </div>
       )}
-
-      <BottomNav />
     </div>
   )
 }

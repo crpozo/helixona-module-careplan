@@ -103,11 +103,11 @@ export function ProgressPage() {
     <div className="space-y-6">
       {/* Page hero — visible on mobile; desktop top bar already names the section. */}
       <header className="lg:hidden">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
           Progress
         </p>
-        <h1 className="text-lg font-bold text-ink-900">Your journey over time</h1>
-        <p className="mt-0.5 text-sm text-slate-500">
+        <h1 className="text-lg font-bold text-white">Your journey over time</h1>
+        <p className="mt-0.5 text-sm text-slate-400">
           How your weeks, points and stages are trending.
         </p>
       </header>
@@ -265,7 +265,7 @@ export function ProgressPage() {
                 dataKey="pct"
                 radius={[0, 6, 6, 0]}
                 maxBarSize={22}
-                background={{ fill: '#f1f5f9' }}
+                background={{ fill: 'rgba(255,255,255,0.05)' }}
               >
                 {activityData.map((entry) => (
                   <Cell key={entry.name} fill={adherenceColor(entry.pct)} />
@@ -320,9 +320,9 @@ export function ProgressPage() {
                     className={cn(
                       'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors',
                       isCurrent &&
-                        'border-brand-500 bg-brand-500 text-ink-900 shadow-sm ring-4 ring-brand-100',
-                      isDone && 'border-brand-200 bg-brand-100 text-brand-700',
-                      !isCurrent && !isDone && 'border-slate-200 bg-white text-slate-300',
+                        'border-brand-500 bg-brand-500 text-ink-900 shadow-sm ring-4 ring-brand-500/30',
+                      isDone && 'border-brand-500/30 bg-brand-500/15 text-brand-300',
+                      !isCurrent && !isDone && 'border-white/10 text-slate-500',
                     )}
                   >
                     <StageIcon className="h-5 w-5" />
@@ -331,7 +331,7 @@ export function ProgressPage() {
                     <span
                       className={cn(
                         'my-1 w-0.5 flex-1 rounded-full',
-                        isDone ? 'bg-brand-300' : 'bg-slate-200',
+                        isDone ? 'bg-brand-300' : 'bg-white/10',
                       )}
                       aria-hidden
                     />
@@ -344,7 +344,7 @@ export function ProgressPage() {
                     <span
                       className={cn(
                         'text-sm font-semibold',
-                        isCurrent || isDone ? 'text-ink-900' : 'text-slate-400',
+                        isCurrent || isDone ? 'text-white' : 'text-slate-400',
                       )}
                     >
                       {stage.label}
@@ -356,7 +356,7 @@ export function ProgressPage() {
                   <p
                     className={cn(
                       'mt-1 text-sm leading-relaxed',
-                      isCurrent || isDone ? 'text-slate-600' : 'text-slate-400',
+                      isCurrent || isDone ? 'text-slate-300' : 'text-slate-400',
                     )}
                   >
                     {stage.description}
@@ -399,7 +399,7 @@ function ChartEmpty({ title }: { title: string }) {
 
 function TooltipShell({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-md">
+    <div className="rounded-xl border border-white/10 bg-[#15151a] px-3 py-2 shadow-md">
       {children}
     </div>
   )
@@ -411,7 +411,7 @@ function TrendTooltip({ active, payload, label }: TooltipProps<number, string>) 
   return (
     <TooltipShell>
       <p className="text-xs font-semibold text-slate-400">{label}</p>
-      <p className="tnum text-sm font-bold text-ink-900">{pct(value)} adherence</p>
+      <p className="tnum text-sm font-bold text-white">{pct(value)} adherence</p>
     </TooltipShell>
   )
 }
@@ -426,8 +426,8 @@ function ActivityTooltip({ active, payload }: TooltipProps<number, string>) {
   }
   return (
     <TooltipShell>
-      <p className="text-xs font-semibold text-ink-900">{row.name}</p>
-      <p className="mt-0.5 tnum text-sm font-bold text-ink-900">{pct(row.pct)}</p>
+      <p className="text-xs font-semibold text-white">{row.name}</p>
+      <p className="mt-0.5 tnum text-sm font-bold text-white">{pct(row.pct)}</p>
       <p className="tnum text-xs text-slate-400">
         {row.actual} of {row.ordered} done
       </p>
@@ -441,7 +441,7 @@ function PointsTooltip({ active, payload, label }: TooltipProps<number, string>)
   return (
     <TooltipShell>
       <p className="text-xs font-semibold text-slate-400">{label}</p>
-      <p className="tnum text-sm font-bold text-ink-900">{num(value)} pts</p>
+      <p className="tnum text-sm font-bold text-white">{num(value)} pts</p>
     </TooltipShell>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Trash2, ClipboardList, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle } from 'lucide-react'
 import type {
   Activity,
   ActivityCategory,
@@ -26,12 +26,15 @@ import { Button } from '@/components/Button'
 import { IconChip } from '@/components/IconChip'
 import { ProgressBar } from '@/components/ProgressBar'
 
-// Shared field styling — STYLE.md form inputs.
+// Shared field styling — dark glass form inputs.
 const INPUT =
-  'w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-ink-900 ' +
-  'placeholder:text-slate-300 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100'
+  'w-full rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-sm text-white ' +
+  'placeholder:text-slate-500 focus:border-brand-500/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20'
 
 const LABEL = 'mb-1 block text-xs font-medium text-slate-400'
+
+// Dark dropdown list background for native <option> elements.
+const OPTION = 'bg-[#15151a]'
 
 const CATEGORY_KEYS: ActivityCategory[] = ['treatment', 'iv', 'office_visit', 'home']
 const LOCATION_KEYS: ActivityLocation[] = ['in_office', 'at_home']
@@ -63,21 +66,24 @@ export function StaffPage() {
     <div className="space-y-6">
       {/* Page hero — visible on mobile; desktop top bar already names the section. */}
       <header className="lg:hidden">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
           Staff console
         </p>
-        <h1 className="text-lg font-bold text-ink-900">Manual data entry</h1>
-        <p className="mt-0.5 text-sm text-slate-500">
+        <h1 className="text-lg font-bold text-white">Manual data entry</h1>
+        <p className="mt-0.5 text-sm text-slate-400">
           Author the plan and log actual visits from ECW.
         </p>
       </header>
 
       {/* 1) INTRO ----------------------------------------------------------- */}
-      <Card className="border-ink-700/40 bg-ink-900 text-white">
+      <Card className="border border-white/10 bg-gradient-to-br from-brand-500/12 via-white/[0.03] to-transparent text-white">
         <div className="flex items-start gap-4">
-          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-ink-900">
-            <ClipboardList className="h-5 w-5" />
-          </span>
+          <IconChip
+            icon="ClipboardList"
+            size="h-11 w-11"
+            iconClassName="h-5 w-5"
+            className="rounded-xl"
+          />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
               ECW → app bridge
@@ -118,16 +124,16 @@ export function StaffPage() {
       <Card
         title="Danger zone"
         subtitle="Restore the demo to its seeded state."
-        className="border-rose-200"
+        className="border-rose-500/20"
       >
-        <div className="flex flex-col gap-3 rounded-xl border border-rose-100 bg-rose-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl border border-rose-500/15 bg-rose-500/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-600">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-rose-300">
               <AlertTriangle className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-ink-900">Reset demo data</p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="text-sm font-semibold text-white">Reset demo data</p>
+              <p className="mt-0.5 text-xs text-slate-400">
                 Discards every plan edit, weekly log and redemption for {patient.firstName}.
               </p>
             </div>
@@ -178,7 +184,7 @@ function PlanSettingsCard() {
             onChange={(e) => actions.setStage(e.target.value as StageKey)}
           >
             {STAGES.map((s) => (
-              <option key={s.key} value={s.key}>
+              <option key={s.key} value={s.key} className={OPTION}>
                 {s.label}
               </option>
             ))}
@@ -197,7 +203,7 @@ function PlanSettingsCard() {
             onChange={(e) => actions.setPacing(e.target.value as Pacing)}
           >
             {PACINGS.map((p) => (
-              <option key={p.key} value={p.key}>
+              <option key={p.key} value={p.key} className={OPTION}>
                 {p.label}
               </option>
             ))}
@@ -285,7 +291,7 @@ function ActivitiesEditorCard() {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr className="border-y border-slate-100 text-left text-xs font-medium text-slate-400">
+            <tr className="border-y border-white/5 text-left text-xs font-medium text-slate-400">
               <th className="px-5 py-2.5 font-medium">Activity</th>
               <th className="px-3 py-2.5 font-medium">Location</th>
               <th className="px-3 py-2.5 font-medium">Category</th>
@@ -294,7 +300,7 @@ function ActivitiesEditorCard() {
               <th className="px-5 py-2.5 font-medium text-right">Remove</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-white/5">
             {activities.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-5 py-8 text-center text-sm text-slate-400">
@@ -321,16 +327,16 @@ function ActivityEditRow({ activity }: { activity: Activity }) {
   const meta = CATEGORY_META[activity.category]
 
   return (
-    <tr className="align-middle hover:bg-slate-50/60">
+    <tr className="align-middle hover:bg-white/5">
       <td className="px-5 py-2.5">
         <div className="flex items-center gap-2.5">
           <IconChip icon={activity.icon} size="h-8 w-8" iconClassName="h-4 w-4" />
-          <span className="font-semibold text-ink-900">{activity.name}</span>
+          <span className="font-semibold text-white">{activity.name}</span>
         </div>
       </td>
-      <td className="px-3 py-2.5 text-slate-500">{LOCATION_LABEL[activity.location]}</td>
+      <td className="px-3 py-2.5 text-slate-400">{LOCATION_LABEL[activity.location]}</td>
       <td className="px-3 py-2.5">
-        <span className="text-slate-500">{meta.label}</span>
+        <span className="text-slate-400">{meta.label}</span>
       </td>
       <td className="px-3 py-2.5 text-right">
         <input
@@ -367,7 +373,7 @@ function ActivityEditRow({ activity }: { activity: Activity }) {
         <Button
           variant="ghost"
           size="sm"
-          className="ml-auto h-10 w-10 p-0 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+          className="ml-auto h-10 w-10 p-0 text-rose-300 hover:bg-rose-500/15 hover:text-rose-200"
           aria-label={`Remove ${activity.name}`}
           onClick={() => {
             if (window.confirm(`Remove "${activity.name}" from the plan?`)) {
@@ -412,7 +418,7 @@ function AddActivityForm() {
   }
 
   return (
-    <div className="border-t border-slate-100 bg-slate-50/60 p-5">
+    <div className="border-t border-white/5 bg-white/[0.03] p-5">
       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
         Add activity
       </p>
@@ -447,7 +453,7 @@ function AddActivityForm() {
             }
           >
             {LOCATION_KEYS.map((loc) => (
-              <option key={loc} value={loc}>
+              <option key={loc} value={loc} className={OPTION}>
                 {LOCATION_LABEL[loc]}
               </option>
             ))}
@@ -467,7 +473,7 @@ function AddActivityForm() {
             }
           >
             {CATEGORY_KEYS.map((cat) => (
-              <option key={cat} value={cat}>
+              <option key={cat} value={cat} className={OPTION}>
                 {CATEGORY_META[cat].label}
               </option>
             ))}
@@ -590,7 +596,7 @@ function WeeklyLogCard() {
             onChange={(e) => setSelectedWeek(Number(e.target.value))}
           >
             {sortedWeeks.map((w) => (
-              <option key={w.weekNumber} value={w.weekNumber}>
+              <option key={w.weekNumber} value={w.weekNumber} className={OPTION}>
                 Week {w.weekNumber}
                 {w.weekNumber === currentWeek ? ' (current)' : ''}
               </option>
@@ -601,7 +607,7 @@ function WeeklyLogCard() {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <p className="text-xs text-slate-400">Week adherence</p>
-            <p className="tnum text-2xl font-bold tracking-tight text-ink-900">
+            <p className="tnum text-2xl font-bold tracking-tight text-white">
               {pct(adherence.pct)}
             </p>
           </div>
@@ -618,11 +624,11 @@ function WeeklyLogCard() {
 
       {/* Per-activity actual entry */}
       {plan.activities.length === 0 ? (
-        <p className="mt-4 rounded-xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+        <p className="mt-4 rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-slate-400">
           Add activities above before logging actuals.
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-100">
+        <ul className="mt-4 divide-y divide-white/5 rounded-xl border border-white/5">
           {adherence.byActivity.map((row) => {
             // Use the clamped actual so the box never shows more than the
             // ordered max (e.g. after staff lowers an activity's frequency).
@@ -638,7 +644,7 @@ function WeeklyLogCard() {
                   iconClassName="h-4 w-4"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-ink-900">
+                  <p className="truncate text-sm font-semibold text-white">
                     {row.activity.name}
                   </p>
                   <p className="text-xs text-slate-400">

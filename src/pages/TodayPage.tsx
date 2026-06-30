@@ -1,37 +1,18 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  ArrowRight,
-  CalendarDays,
-  Check,
-  MapPin,
-  Plus,
-  Sparkles,
-} from 'lucide-react'
-import type { Reward } from '@/types'
+import { ChevronRight } from 'lucide-react'
 import { useApp, useDerived } from '@/store/store'
-import { STAGE_BY_KEY, PACING_BY_KEY } from '@/lib/plan'
-import { formatDate, formatWeekday, num, pct, plural } from '@/lib/format'
+import { STAGE_BY_KEY, stageProgress, CATEGORY_META } from '@/lib/plan'
+import { formatWeekday, formatDate, num, pct } from '@/lib/format'
 import { adherenceColor } from '@/lib/colors'
-import { getIcon } from '@/lib/icons'
 import { Card } from '@/components/Card'
 import { KpiCard } from '@/components/KpiCard'
 import { Pill } from '@/components/Pill'
+import { IconChip } from '@/components/IconChip'
 import { ProgressRing } from '@/components/ProgressRing'
 import { ProgressBar } from '@/components/ProgressBar'
 import { Button } from '@/components/Button'
-import { Avatar } from '@/components/Avatar'
-import { EmptyState } from '@/components/EmptyState'
 import { SectionHeading } from '@/components/SectionHeading'
-
-const STATUS_PILL: Record<
-  'good' | 'watch' | 'bad',
-  { tone: 'good' | 'watch' | 'bad'; label: string }
-> = {
-  good: { tone: 'good', label: 'On track' },
-  watch: { tone: 'watch', label: 'Keep going' },
-  bad: { tone: 'bad', label: 'Behind' },
-}
 
 function greeting(date: Date): string {
   const h = date.getHours()
@@ -40,397 +21,262 @@ function greeting(date: Date): string {
   return 'Good evening'
 }
 
+const ADJUST_ACTIONS: { icon: string; label: string; to: string }[] = [
+  { icon: 'Stethoscope', label: 'Edit plan & visits', to: '/staff' },
+  { icon: 'HeartPulse', label: 'View full plan', to: '/plan' },
+  { icon: 'Gift', label: 'Redeem rewards', to: '/rewards' },
+]
+
 export function TodayPage() {
-  const { state, actions } = useApp()
+  const { state } = useApp()
   const d = useDerived()
 
   const now = useMemo(() => new Date(), [])
   const hello = greeting(now)
 
-  const { patient, plan, rewards } = state
+  const { patient, plan } = state
   const stage = STAGE_BY_KEY[plan.stage]
-  const pacing = PACING_BY_KEY[plan.pacing]
-  const StageIcon = getIcon(stage.icon)
-  const PacingIcon = getIcon(pacing.icon)
+  const stagePct = stageProgress(plan.stage)
 
   const adherence = d.currentAdherence
   const ringColor = adherenceColor(adherence.pct)
-  const status = STATUS_PILL[adherence.status]
 
-  // Today's quick-log = at-home activities, with this week's remaining count.
-  const homeFocus = useMemo(() => {
-    const byId = new Map(adherence.byActivity.map((a) => [a.activity.id, a]))
-    return plan.activities
-      .filter((a) => a.location === 'at_home')
-      .map((activity) => {
-        const row = byId.get(activity.id)
-        const ordered = row?.ordered ?? activity.timesPerWeek
-        const actual = row?.actual ?? 0
-        return { activity, ordered, actual, remaining: Math.max(0, ordered - actual) }
-      })
-  }, [plan.activities, adherence.byActivity])
+  // Weekly in-office training: sum the ordered times-per-week across in-office items.
+  const inOffice = useMemo(
+    () => plan.activities.filter((a) => a.location === 'in_office'),
+    [plan.activities],
+  )
+  const sessionsPerWeek = useMemo(
+    () => inOffice.reduce((sum, a) => sum + a.timesPerWeek, 0),
+    [inOffice],
+  )
 
-  const upcoming = d.upcoming.slice(0, 3)
+  // Care-focus chips: program label + a couple of distinct activity categories present.
+  const focusChips = useMemo(() => {
+    const cats = Array.from(new Set(plan.activities.map((a) => a.category)))
+      .slice(0, 2)
+      .map((c) => CATEGORY_META[c].label)
+    return [patient.programLabel, ...cats]
+  }, [plan.activities, patient.programLabel])
 
-  // Reward nudge: the most valuable reward they can already afford (most
-  // enticing "you unlocked this" moment); else progress toward the cheapest.
-  const affordable = useMemo<Reward | null>(() => {
-    const list = rewards
-      .filter((r) => r.cost <= d.points.balance)
-      .sort((a, b) => b.cost - a.cost)
-    return list[0] ?? null
-  }, [rewards, d.points.balance])
+  // This week's schedule cards — in-office activities, up to 4.
+  const scheduleCards = useMemo(
+    () => adherence.byActivity.filter((a) => a.activity.location === 'in_office').slice(0, 4),
+    [adherence.byActivity],
+  )
 
-  const cheapest = useMemo<Reward | null>(() => {
-    return [...rewards].sort((a, b) => a.cost - b.cost)[0] ?? null
-  }, [rewards])
+  // Top activities for the "By activity" intensity breakdown.
+  const topActivities = useMemo(
+    () => adherence.byActivity.slice(0, 4),
+    [adherence.byActivity],
+  )
+
+  const next = d.upcoming[0]
+  const nextLinked = next ? plan.activities.find((a) => a.id === next.activityId) : undefined
+  const nextIcon = nextLinked ? nextLinked.icon : 'CalendarDays'
 
   return (
     <div className="space-y-6">
-      {/* 1) GREETING HERO ---------------------------------------------------- */}
-      <section className="animate-fade-up overflow-hidden rounded-2xl border border-ink-700/40 bg-ink-900 text-white shadow-sm">
-        <div className="relative p-5 sm:p-7">
-          {/* warm gold glow */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl"
-          />
-          <div className="relative flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-medium uppercase tracking-wide text-brand-300">
-                {formatDate(now.toISOString(), {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-                {hello}, <span className="text-brand-400">{patient.firstName}</span>
-              </h1>
-              <p className="mt-2 max-w-md text-sm text-slate-300">
-                Your goal:{' '}
-                <span className="font-medium text-white">&ldquo;{plan.goal}&rdquo;</span>
-              </p>
-            </div>
-            <Avatar
-              firstName={patient.firstName}
-              lastName={patient.lastName}
-              size="h-12 w-12 shrink-0 ring-2 ring-brand-500/40"
-            />
-          </div>
-
-          {/* context chips — tap to view the full plan */}
-          <div className="relative mt-5 flex flex-wrap gap-2">
-            <Link
-              to="/plan"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 transition-colors hover:border-brand-400 hover:bg-white/10"
-            >
-              <StageIcon className="h-3.5 w-3.5 text-brand-400" />
-              {stage.label}
-            </Link>
-            <Link
-              to="/plan"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 transition-colors hover:border-brand-400 hover:bg-white/10"
-            >
-              <PacingIcon className="h-3.5 w-3.5 text-brand-400" />
-              {pacing.label} pace
-            </Link>
-            <Link
-              to="/plan"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 transition-colors hover:border-brand-400 hover:bg-white/10"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-brand-400" />
-              {patient.programLabel}
-            </Link>
-          </div>
+      {/* 1) PAGE HEADER ---------------------------------------------------- */}
+      <header className="animate-fade-up flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-wide text-brand-300">
+            Your care roadmap
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            {hello}, <span className="text-brand-300">{patient.firstName}</span>
+          </h1>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" className="cursor-default tnum" tabIndex={-1}>
+            Week {num(state.currentWeek)}
+          </Button>
+          <Link to="/staff">
+            <Button variant="secondary" size="sm">
+              Adjust
+            </Button>
+          </Link>
+          <Link to="/week">
+            <Button size="sm">Log activity</Button>
+          </Link>
+        </div>
+      </header>
+
+      {/* 2) KPI CARD ROW --------------------------------------------------- */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          to="/plan"
+          icon="HeartPulse"
+          label="Current plan"
+          value={stage.label}
+          badge={<Pill tone="brand">Active</Pill>}
+          hint={
+            <span className="block">
+              <ProgressBar value={stagePct} className="mb-1.5" />
+              <span className="tnum">{pct(stagePct)} complete</span>
+            </span>
+          }
+        />
+        <KpiCard
+          to="/week"
+          icon="CalendarDays"
+          label="Weekly training"
+          value={
+            <span className="tnum">
+              {num(sessionsPerWeek)} session{sessionsPerWeek === 1 ? '' : 's'}
+            </span>
+          }
+          hint="Avg 30–60 min per session"
+        />
+        <KpiCard
+          to="/plan"
+          icon="Target"
+          label="Care focus"
+          value={stage.short}
+          hint={
+            <span className="mt-1 flex flex-wrap gap-1">
+              {focusChips.map((label) => (
+                <Pill key={label} tone="neutral">
+                  {label}
+                </Pill>
+              ))}
+            </span>
+          }
+        />
+        <KpiCard
+          to="/plan"
+          icon={nextIcon}
+          label="Next visit"
+          value={next ? next.title : 'No visits'}
+          hint={
+            next
+              ? `${formatWeekday(next.date)} · ${formatDate(next.date, {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })} · ${next.provider}`
+              : 'All clear'
+          }
+        />
+      </div>
+
+      {/* 3) THIS WEEK'S SCHEDULE ------------------------------------------ */}
+      <section>
+        <SectionHeading
+          icon="CalendarDays"
+          title="This week"
+          subtitle="Your in-office sessions"
+          action={
+            <Link to="/week" className="text-xs font-semibold text-brand-300 hover:text-brand-200">
+              Log activity
+            </Link>
+          }
+        />
+        {scheduleCards.length === 0 ? (
+          <Card>
+            <p className="text-sm text-slate-400">No in-office sessions scheduled this week.</p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {scheduleCards.map(({ activity, ordered, actual, pct: aPct }) => {
+              const tone =
+                actual >= ordered && ordered > 0 ? 'good' : actual > 0 ? 'brand' : 'neutral'
+              const label =
+                actual >= ordered && ordered > 0 ? 'Done' : actual > 0 ? 'In progress' : 'To do'
+              return (
+                <Link
+                  key={activity.id}
+                  to="/week"
+                  className="group flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] p-4 backdrop-blur transition-colors hover:border-brand-500/40 hover:bg-white/[0.055] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <IconChip icon={activity.icon} size="h-10 w-10" />
+                    <Pill tone={tone}>{label}</Pill>
+                  </div>
+                  <p className="mt-4 truncate text-sm font-semibold text-white">{activity.name}</p>
+                  <dl className="mt-3 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Per week</dt>
+                      <dd className="font-medium text-white tnum">{num(ordered)}x</dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Done</dt>
+                      <dd className="font-medium text-white tnum">{num(actual)}</dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Adherence</dt>
+                      <dd className="font-medium text-white tnum">{pct(aPct)}</dd>
+                    </div>
+                  </dl>
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </section>
 
-      {/* 2) THIS WEEK SNAPSHOT ---------------------------------------------- */}
-      <Card>
-        <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center">
-          <Link
-            to="/week"
-            aria-label="Go to This Week to log activities"
-            className="shrink-0 rounded-full transition-transform hover:scale-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
-          >
-            <ProgressRing value={adherence.pct} size={132} stroke={12} color={ringColor}>
-              <span className="text-3xl font-bold tracking-tight text-ink-900 tnum">
+      {/* 4) BOTTOM ROW ----------------------------------------------------- */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {/* a) Overall progress */}
+        <Card title="Overall progress">
+          <div className="flex flex-col items-center text-center">
+            <ProgressRing value={adherence.pct} size={160} stroke={14} color={ringColor}>
+              <span className="text-3xl font-bold tracking-tight text-white tnum">
                 {pct(adherence.pct)}
               </span>
               <span className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 this week
               </span>
             </ProgressRing>
-          </Link>
-
-          <div className="w-full flex-1 text-center sm:text-left">
-            <div className="flex items-center justify-center gap-2 sm:justify-start">
-              <h2 className="text-sm font-semibold text-ink-900">This week so far</h2>
-              <Pill tone={status.tone}>{status.label}</Pill>
-            </div>
-            <p className="mt-1 text-sm text-slate-500">
-              <span className="font-semibold text-ink-900 tnum">{adherence.actual}</span> of{' '}
-              <span className="font-semibold text-ink-900 tnum">{adherence.ordered}</span> things
-              done
+            <p className="mt-4 text-sm text-slate-300">
+              <span className="font-semibold text-white tnum">{num(adherence.actual)}</span> of{' '}
+              <span className="font-semibold text-white tnum">{num(adherence.ordered)}</span> done
             </p>
-
-            <div className="mt-3 flex items-center justify-center gap-4 sm:justify-start">
-              <div>
-                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                  Points this week
-                </p>
-                <p className="text-xl font-bold tracking-tight text-brand-700 tnum">
-                  +{num(d.points.thisWeek)}
-                </p>
-              </div>
-              <Link to="/week" className="ml-auto sm:ml-0">
-                <Button>
-                  Log activities
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
+            <p className="mt-1 text-xs text-slate-400">
+              <span className="font-semibold text-brand-300 tnum">+{num(d.points.thisWeek)}</span>{' '}
+              points this week
+            </p>
           </div>
-        </div>
-      </Card>
-
-      {/* 3) QUICK STATS ROW -------------------------------------------------- */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <KpiCard
-          to="/progress"
-          label="Current streak"
-          icon="Flame"
-          value={
-            <span className="flex items-baseline gap-1">
-              {num(d.streak.current)}
-              <span className="text-sm font-medium text-slate-400">
-                {plural(d.streak.current, 'wk')}
-              </span>
-            </span>
-          }
-          hint={`Best: ${num(d.streak.best)} ${plural(d.streak.best, 'week')}`}
-        />
-        <KpiCard
-          to="/rewards"
-          label="Loyalty tier"
-          icon={d.level.icon}
-          value={d.level.tier}
-          hint={
-            d.level.nextTier
-              ? `${num(d.level.toNext)} pts to ${d.level.nextTier}`
-              : 'Top tier — radiant!'
-          }
-        />
-        <KpiCard
-          to="/rewards"
-          label="Points balance"
-          icon="Coins"
-          value={num(d.points.balance)}
-          hint={`${num(d.points.lifetime)} earned all-time`}
-        />
-      </div>
-
-      {/* 4) TODAY'S FOCUS ---------------------------------------------------- */}
-      <section>
-        <SectionHeading
-          icon="Home"
-          title="Today's focus"
-          subtitle="Quick-log your at-home routine"
-        />
-        <Card flush={homeFocus.length === 0}>
-          {homeFocus.length === 0 ? (
-            <div className="p-5">
-              <EmptyState
-                icon="Home"
-                title="No at-home activities yet"
-                description="When your plan includes at-home routines, you'll log them here."
-              />
-            </div>
-          ) : (
-          <ul className="divide-y divide-slate-100">
-            {homeFocus.map(({ activity, remaining, ordered }) => {
-              const ActIcon = getIcon(activity.icon)
-              const done = remaining <= 0
-              return (
-                <li
-                  key={activity.id}
-                  className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
-                >
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
-                    <ActIcon className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-ink-900">
-                      {activity.name}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {done ? (
-                        <span className="font-medium text-emerald-600">All done this week</span>
-                      ) : (
-                        <>
-                          <span className="font-medium text-slate-500 tnum">{remaining}</span> of{' '}
-                          <span className="tnum">{ordered}</span> left this week
-                        </>
-                      )}
-                    </p>
-                  </div>
-                  {done ? (
-                    <span className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-                      <Check className="h-4 w-4" />
-                      Done
-                    </span>
-                  ) : (
-                    <Button
-                      className="min-h-10 shrink-0"
-                      onClick={() => actions.logCompletion(activity.id)}
-                      aria-label={`Log ${activity.name}`}
-                    >
-                      <Plus className="h-4 w-4" />
-                      Done
-                    </Button>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-          )}
         </Card>
-      </section>
 
-      {/* 5) NEXT APPOINTMENTS ------------------------------------------------ */}
-      <section>
-        <SectionHeading
-          icon="CalendarDays"
-          title="Next appointments"
-          subtitle="What's coming up at the clinic"
-          action={
-            <Link
-              to="/plan"
-              className="text-xs font-semibold text-brand-700 hover:text-brand-600"
-            >
-              View plan
-            </Link>
-          }
-        />
-        <Card flush>
-          {upcoming.length === 0 ? (
-            <div className="p-5">
-              <EmptyState
-                icon="CalendarDays"
-                title="No upcoming visits"
-                description="When new appointments are scheduled, they'll appear here."
-              />
-            </div>
+        {/* b) By activity */}
+        <Card title="By activity" subtitle="Adherence per item">
+          {topActivities.length === 0 ? (
+            <p className="text-sm text-slate-400">No activities in your plan yet.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
-              {upcoming.map((appt) => {
-                const linked = plan.activities.find((a) => a.id === appt.activityId)
-                const ApptIcon = linked ? getIcon(linked.icon) : CalendarDays
-                return (
-                  <li key={appt.id}>
-                    <Link
-                      to="/plan"
-                      className="flex items-center gap-3 p-4 transition-colors hover:bg-slate-50"
-                    >
-                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-brand-400">
-                      <ApptIcon className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-ink-900">
-                        {appt.title}
-                      </p>
-                      <p className="flex items-center gap-1 truncate text-xs text-slate-400">
-                        <MapPin className="h-3 w-3 shrink-0" />
-                        {appt.provider}
-                      </p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className="text-xs font-semibold text-ink-900">
-                        {formatWeekday(appt.date)}
-                      </p>
-                      <p className="text-xs text-slate-400 tnum">
-                        {formatDate(appt.date, {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                    </Link>
-                  </li>
-                )
-              })}
+            <ul className="space-y-4">
+              {topActivities.map(({ activity, pct: aPct }) => (
+                <li key={activity.id}>
+                  <div className="mb-1.5 flex items-center justify-between gap-2 text-xs">
+                    <span className="truncate font-medium text-white">{activity.name}</span>
+                    <span className="shrink-0 text-slate-400 tnum">{pct(aPct)}</span>
+                  </div>
+                  <ProgressBar value={aPct} color={adherenceColor(aPct)} />
+                </li>
+              ))}
             </ul>
           )}
         </Card>
-      </section>
 
-      {/* 6) REWARD NUDGE ----------------------------------------------------- */}
-      {affordable ? (
-        <Card className="border-brand-200 bg-gradient-to-br from-brand-50 to-white">
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-ink-900">
-              {(() => {
-                const RewardIcon = getIcon(affordable.icon)
-                return <RewardIcon className="h-6 w-6" />
-              })()}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-                Reward unlocked
-              </p>
-              <p className="mt-0.5 text-sm font-semibold text-ink-900">
-                You have{' '}
-                <span className="tnum">{num(d.points.balance)}</span> pts — redeem{' '}
-                <span className="text-brand-700">{affordable.title}</span>
-              </p>
-              <p className="mt-0.5 text-xs text-slate-500">{affordable.description}</p>
-            </div>
-            <Link to="/rewards" className="w-full shrink-0 sm:w-auto">
-              <Button className="w-full sm:w-auto">
-                Redeem
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
+        {/* c) Adjust your plan */}
+        <Card title="Adjust your plan" subtitle="Quick links">
+          <ul className="space-y-2">
+            {ADJUST_ACTIONS.map(({ icon, label, to }) => (
+              <li key={to}>
+                <Link
+                  to={to}
+                  className="group flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.03] p-3 transition-colors hover:border-brand-500/40 hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                >
+                  <IconChip icon={icon} size="h-9 w-9" />
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+                    {label}
+                  </span>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-500 transition-colors group-hover:text-brand-300" />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </Card>
-      ) : cheapest ? (
-        <Card className="border-brand-200 bg-gradient-to-br from-brand-50 to-white">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
-                  {(() => {
-                    const RewardIcon = getIcon(cheapest.icon)
-                    return <RewardIcon className="h-5 w-5" />
-                  })()}
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-ink-900">
-                    Closing in on {cheapest.title}
-                  </p>
-                  <p className="text-xs text-slate-500 tnum">
-                    {num(Math.max(0, cheapest.cost - d.points.balance))} pts to go
-                  </p>
-                </div>
-              </div>
-              <Link to="/rewards">
-                <Button variant="secondary" size="sm">
-                  Rewards
-                </Button>
-              </Link>
-            </div>
-            <ProgressBar
-              value={cheapest.cost > 0 ? (d.points.balance / cheapest.cost) * 100 : 100}
-            />
-            <p className="text-right text-[11px] text-slate-400 tnum">
-              {num(d.points.balance)} / {num(cheapest.cost)} pts
-            </p>
-          </div>
-        </Card>
-      ) : null}
+      </div>
     </div>
   )
 }
