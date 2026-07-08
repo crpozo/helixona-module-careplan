@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Coins, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { getIcon } from '@/lib/icons'
@@ -154,8 +154,18 @@ export function AppShell() {
   const { level } = useDerived()
   const isStaff = state.role === 'staff'
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const TierIcon = getIcon(level.icon)
+
+  // Picking a role both switches the viewer AND lands them on that role's home,
+  // so the toggle always navigates somewhere useful (Patient → their personal
+  // "Today" home, Staff → the Staff workspace) instead of silently flipping a
+  // flag. Mirrors tapping the home button for the selected persona.
+  const handleRoleChange = (role: UserRole) => {
+    actions.setRole(role)
+    navigate(role === 'staff' ? '/staff' : '/')
+  }
 
   useEffect(() => {
     setMenuOpen(false)
@@ -224,7 +234,7 @@ export function AppShell() {
             <div className="ml-auto flex items-center gap-2.5">
               <RoleSwitch
                 role={state.role}
-                onChange={actions.setRole}
+                onChange={handleRoleChange}
                 className="hidden md:inline-flex"
               />
               <PointsChip />
@@ -281,7 +291,7 @@ export function AppShell() {
               <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 Viewing as
               </p>
-              <RoleSwitch role={state.role} onChange={actions.setRole} className="w-full justify-center" />
+              <RoleSwitch role={state.role} onChange={handleRoleChange} className="w-full justify-center" />
             </div>
 
             <nav className="mt-5 space-y-1">
