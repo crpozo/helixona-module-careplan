@@ -40,7 +40,7 @@ body {
 }
 /* Room for the fixed mobile bottom tab bar. */
 .pb-safe-nav {
-  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* Thin light scrollbars. */
