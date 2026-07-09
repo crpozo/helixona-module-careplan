@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Plus, Trash2, AlertTriangle } from 'lucide-react'
 import type {
   Activity,
   ActivityCategory,
   ActivityLocation,
-  StageKey,
-  Pacing,
   WeekLog,
 } from '@/types'
 import { useApp } from '@/store/store'
@@ -26,15 +24,12 @@ import { Button } from '@/components/Button'
 import { IconChip } from '@/components/IconChip'
 import { ProgressBar } from '@/components/ProgressBar'
 
-// Shared field styling — dark glass form inputs.
+// Shared field styling — light, friendly form inputs.
 const INPUT =
-  'w-full rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-sm text-white ' +
-  'placeholder:text-slate-500 focus:border-brand-500/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20'
+  'w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 ' +
+  'placeholder:text-slate-400 focus:border-brand-400 focus:outline-none'
 
-const LABEL = 'mb-1 block text-xs font-medium text-slate-400'
-
-// Dark dropdown list background for native <option> elements.
-const OPTION = 'bg-[#15151a]'
+const LABEL = 'mb-1 block text-xs font-extrabold uppercase tracking-wide text-slate-500'
 
 const CATEGORY_KEYS: ActivityCategory[] = ['treatment', 'iv', 'office_visit', 'home']
 const LOCATION_KEYS: ActivityLocation[] = ['in_office', 'at_home']
@@ -58,53 +53,84 @@ function slugId(name: string): string {
   return `${base}-${Math.random().toString(36).slice(2, 6)}`
 }
 
+/** One option in a segmented choice group (stage, pacing). */
+function SegButton({
+  selected,
+  onClick,
+  title,
+  children,
+}: {
+  selected: boolean
+  onClick: () => void
+  title?: string
+  children: ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-pressed={selected}
+      onClick={onClick}
+      className={cn(
+        'rounded-xl border-2 px-3 py-2 text-xs font-extrabold transition-colors',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
+        selected
+          ? 'border-brand-400 bg-brand-50 text-brand-800'
+          : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
 export function StaffPage() {
   const { state, actions } = useApp()
   const { patient } = state
 
   return (
-    <div className="space-y-6">
-      {/* Page hero — visible on mobile; desktop top bar already names the section. */}
-      <header className="lg:hidden">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
+    <div className="space-y-5">
+      {/* Page hero */}
+      <header className="animate-fade-up pt-2">
+        <p className="text-xs font-extrabold uppercase tracking-wide text-brand-700">
           Staff console
         </p>
-        <h1 className="text-lg font-bold text-white">Manual data entry</h1>
-        <p className="mt-0.5 text-sm text-slate-400">
+        <h1 className="text-3xl font-extrabold text-slate-800">Manual data entry</h1>
+        <p className="mt-0.5 text-sm font-semibold text-slate-500">
           Author the plan and log actual visits from ECW.
         </p>
       </header>
 
       {/* 1) INTRO ----------------------------------------------------------- */}
-      <Card className="border border-white/10 bg-gradient-to-br from-brand-500/12 via-white/[0.03] to-transparent text-white">
+      <Card className="border-brand-200 bg-brand-50">
         <div className="flex items-start gap-4">
           <IconChip
-            icon="ClipboardList"
+            icon="Stethoscope"
             size="h-11 w-11"
             iconClassName="h-5 w-5"
-            className="rounded-xl"
+            className="bg-white text-brand-800"
           />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
+            <p className="text-xs font-extrabold uppercase tracking-wide text-brand-700">
               ECW → app bridge
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-300">
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">
               Clinic data entry — author the plan of care and log actual visits from ECW
               for{' '}
-              <span className="font-semibold text-white">
+              <span className="font-extrabold text-slate-800">
                 {patient.firstName} {patient.lastName}
               </span>{' '}
               (
-              <span className="tnum font-semibold text-white">
+              <span className="tnum font-extrabold text-slate-800">
                 {patient.ecwId ?? '—'}
               </span>
               ).
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Pill tone="brand">{PROGRAM_LABEL[patient.program]}</Pill>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs font-semibold text-slate-500">
                 Provider:{' '}
-                <span className="font-semibold text-slate-200">{patient.provider}</span>
+                <span className="font-extrabold text-slate-700">{patient.provider}</span>
               </span>
             </div>
           </div>
@@ -124,22 +150,22 @@ export function StaffPage() {
       <Card
         title="Danger zone"
         subtitle="Restore the demo to its seeded state."
-        className="border-rose-500/20"
+        className="border-rose-200"
       >
-        <div className="flex flex-col gap-3 rounded-xl border border-rose-500/15 bg-rose-500/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border-2 border-rose-100 bg-rose-50 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-rose-300">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-500">
               <AlertTriangle className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white">Reset demo data</p>
-              <p className="mt-0.5 text-xs text-slate-400">
+              <p className="text-sm font-extrabold text-slate-800">Reset demo data</p>
+              <p className="mt-0.5 text-xs font-semibold text-slate-500">
                 Discards every plan edit, weekly log and redemption for {patient.firstName}.
               </p>
             </div>
           </div>
           <Button
-            variant="dark"
+            variant="danger"
             className="shrink-0"
             onClick={() => {
               if (
@@ -171,78 +197,76 @@ function PlanSettingsCard() {
       title="Plan settings"
       subtitle="Stage, pacing and the headline goal — saved as you edit."
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-4">
         {/* Stage */}
         <div>
-          <label className={LABEL} htmlFor="staff-stage">
-            Stage
-          </label>
-          <select
-            id="staff-stage"
-            className={INPUT}
-            value={plan.stage}
-            onChange={(e) => actions.setStage(e.target.value as StageKey)}
-          >
+          <p className={LABEL}>Stage</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Care journey stage">
             {STAGES.map((s) => (
-              <option key={s.key} value={s.key} className={OPTION}>
+              <SegButton
+                key={s.key}
+                selected={plan.stage === s.key}
+                title={s.description}
+                onClick={() => actions.setStage(s.key)}
+              >
                 {s.label}
-              </option>
+              </SegButton>
             ))}
-          </select>
+          </div>
         </div>
 
         {/* Pacing */}
         <div>
-          <label className={LABEL} htmlFor="staff-pacing">
-            Pacing
-          </label>
-          <select
-            id="staff-pacing"
-            className={INPUT}
-            value={plan.pacing}
-            onChange={(e) => actions.setPacing(e.target.value as Pacing)}
-          >
+          <p className={LABEL}>Pacing</p>
+          <div className="grid grid-cols-3 gap-2" role="group" aria-label="Plan pacing">
             {PACINGS.map((p) => (
-              <option key={p.key} value={p.key} className={OPTION}>
+              <SegButton
+                key={p.key}
+                selected={plan.pacing === p.key}
+                title={p.description}
+                onClick={() => actions.setPacing(p.key)}
+              >
                 {p.label}
-              </option>
+              </SegButton>
             ))}
-          </select>
+          </div>
         </div>
 
-        {/* Adherence target */}
-        <div>
-          <label className={LABEL} htmlFor="staff-target">
-            Adherence target (%)
-          </label>
-          <input
-            id="staff-target"
-            type="number"
-            min={10}
-            max={100}
-            step={5}
-            className={cn(INPUT, 'tnum')}
-            value={adherenceTarget}
-            onChange={(e) => actions.setAdherenceTarget(Number(e.target.value))}
-          />
-        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Adherence target */}
+          <div>
+            <label className={LABEL} htmlFor="staff-target">
+              Adherence target (%)
+            </label>
+            <input
+              id="staff-target"
+              type="number"
+              min={10}
+              max={100}
+              step={5}
+              className={cn(INPUT, 'tnum')}
+              value={adherenceTarget}
+              onChange={(e) => actions.setAdherenceTarget(Number(e.target.value))}
+            />
+          </div>
 
-        {/* Start date */}
-        <div>
-          <label className={LABEL} htmlFor="staff-start">
-            Plan start date (week 1)
-          </label>
-          <input
-            id="staff-start"
-            type="date"
-            className={cn(INPUT, 'tnum')}
-            value={plan.startDate}
-            onChange={(e) => actions.setPlanMeta({ startDate: e.target.value })}
-          />
+          {/* Start date */}
+          <div>
+            <label className={LABEL} htmlFor="staff-start">
+              Plan start date (week 1)
+            </label>
+            <input
+              id="staff-start"
+              type="date"
+              className={cn(INPUT, 'tnum')}
+              value={plan.startDate}
+              onChange={(e) => actions.setPlanMeta({ startDate: e.target.value })}
+            />
+          </div>
         </div>
 
         {/* Focus */}
-        <div className="sm:col-span-2 lg:col-span-2">
+        <div>
           <label className={LABEL} htmlFor="staff-focus">
             Current focus (lead actor)
           </label>
@@ -257,7 +281,7 @@ function PlanSettingsCard() {
         </div>
 
         {/* Goal */}
-        <div className="sm:col-span-2 lg:col-span-3">
+        <div>
           <label className={LABEL} htmlFor="staff-goal">
             Patient goal (in their words)
           </label>
@@ -287,30 +311,31 @@ function ActivitiesEditorCard() {
       title="Activities"
       subtitle={`${activities.length} ${plural(activities.length, 'item', 'items')} on the plan of care`}
     >
-      {/* Table (desktop) / stacked rows (mobile) */}
+      {/* Table (desktop) / horizontally scrollable (mobile) */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr className="border-y border-white/5 text-left text-xs font-medium text-slate-400">
-              <th className="px-5 py-2.5 font-medium">Activity</th>
-              <th className="px-3 py-2.5 font-medium">Location</th>
-              <th className="px-3 py-2.5 font-medium">Category</th>
-              <th className="px-3 py-2.5 font-medium text-right">Times / wk</th>
-              <th className="px-3 py-2.5 font-medium text-right">Points</th>
-              <th className="px-5 py-2.5 font-medium text-right">Remove</th>
+            <tr className="border-y-2 border-slate-100 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">
+              <th className="px-5 py-2.5">Activity</th>
+              <th className="px-3 py-2.5">Location</th>
+              <th className="px-3 py-2.5">Category</th>
+              <th className="px-3 py-2.5 text-right">Times / wk</th>
+              <th className="px-3 py-2.5 text-right">Points</th>
+              <th className="px-5 py-2.5 text-right">Remove</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-slate-100">
             {activities.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-sm text-slate-400">
+                <td
+                  colSpan={6}
+                  className="px-5 py-8 text-center text-sm font-semibold text-slate-400"
+                >
                   No activities yet. Add the first one below.
                 </td>
               </tr>
             ) : (
-              activities.map((a) => (
-                <ActivityEditRow key={a.id} activity={a} />
-              ))
+              activities.map((a) => <ActivityEditRow key={a.id} activity={a} />)
             )}
           </tbody>
         </table>
@@ -327,17 +352,17 @@ function ActivityEditRow({ activity }: { activity: Activity }) {
   const meta = CATEGORY_META[activity.category]
 
   return (
-    <tr className="align-middle hover:bg-white/5">
+    <tr className="align-middle hover:bg-slate-50">
       <td className="px-5 py-2.5">
         <div className="flex items-center gap-2.5">
           <IconChip icon={activity.icon} size="h-8 w-8" iconClassName="h-4 w-4" />
-          <span className="font-semibold text-white">{activity.name}</span>
+          <span className="font-extrabold text-slate-800">{activity.name}</span>
         </div>
       </td>
-      <td className="px-3 py-2.5 text-slate-400">{LOCATION_LABEL[activity.location]}</td>
-      <td className="px-3 py-2.5">
-        <span className="text-slate-400">{meta.label}</span>
+      <td className="px-3 py-2.5 font-semibold text-slate-500">
+        {LOCATION_LABEL[activity.location]}
       </td>
+      <td className="px-3 py-2.5 font-semibold text-slate-500">{meta.label}</td>
       <td className="px-3 py-2.5 text-right">
         <input
           type="number"
@@ -373,7 +398,7 @@ function ActivityEditRow({ activity }: { activity: Activity }) {
         <Button
           variant="ghost"
           size="sm"
-          className="ml-auto h-10 w-10 p-0 text-rose-300 hover:bg-rose-500/15 hover:text-rose-200"
+          className="ml-auto h-10 w-10 rounded-xl p-0 text-rose-500 hover:bg-rose-50 hover:text-rose-600"
           aria-label={`Remove ${activity.name}`}
           onClick={() => {
             if (window.confirm(`Remove "${activity.name}" from the plan?`)) {
@@ -418,8 +443,8 @@ function AddActivityForm() {
   }
 
   return (
-    <div className="border-t border-white/5 bg-white/[0.03] p-5">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+    <div className="rounded-b-[22px] border-t-2 border-slate-100 bg-slate-50 p-5">
+      <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-slate-500">
         Add activity
       </p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-6">
@@ -453,7 +478,7 @@ function AddActivityForm() {
             }
           >
             {LOCATION_KEYS.map((loc) => (
-              <option key={loc} value={loc} className={OPTION}>
+              <option key={loc} value={loc}>
                 {LOCATION_LABEL[loc]}
               </option>
             ))}
@@ -473,7 +498,7 @@ function AddActivityForm() {
             }
           >
             {CATEGORY_KEYS.map((cat) => (
-              <option key={cat} value={cat} className={OPTION}>
+              <option key={cat} value={cat}>
                 {CATEGORY_META[cat].label}
               </option>
             ))}
@@ -513,7 +538,7 @@ function AddActivityForm() {
       </div>
 
       <div className="mt-3 flex justify-end">
-        <Button onClick={add} disabled={!canAdd}>
+        <Button variant="success" onClick={add} disabled={!canAdd}>
           <Plus className="h-4 w-4" />
           Add activity
         </Button>
@@ -596,7 +621,7 @@ function WeeklyLogCard() {
             onChange={(e) => setSelectedWeek(Number(e.target.value))}
           >
             {sortedWeeks.map((w) => (
-              <option key={w.weekNumber} value={w.weekNumber} className={OPTION}>
+              <option key={w.weekNumber} value={w.weekNumber}>
                 Week {w.weekNumber}
                 {w.weekNumber === currentWeek ? ' (current)' : ''}
               </option>
@@ -606,8 +631,8 @@ function WeeklyLogCard() {
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-xs text-slate-400">Week adherence</p>
-            <p className="tnum text-2xl font-bold tracking-tight text-white">
+            <p className="text-xs font-bold text-slate-400">Week adherence</p>
+            <p className="tnum text-2xl font-extrabold tracking-tight text-slate-800">
               {pct(adherence.pct)}
             </p>
           </div>
@@ -624,11 +649,11 @@ function WeeklyLogCard() {
 
       {/* Per-activity actual entry */}
       {plan.activities.length === 0 ? (
-        <p className="mt-4 rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-slate-400">
+        <p className="mt-4 rounded-2xl border-2 border-dashed border-slate-200 px-4 py-6 text-center text-sm font-semibold text-slate-400">
           Add activities above before logging actuals.
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-white/5 rounded-xl border border-white/5">
+        <ul className="mt-4 divide-y divide-slate-100 rounded-2xl border-2 border-slate-100">
           {adherence.byActivity.map((row) => {
             // Use the clamped actual so the box never shows more than the
             // ordered max (e.g. after staff lowers an activity's frequency).
@@ -644,18 +669,15 @@ function WeeklyLogCard() {
                   iconClassName="h-4 w-4"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-white">
+                  <p className="truncate text-sm font-extrabold text-slate-800">
                     {row.activity.name}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs font-semibold text-slate-400">
                     {LOCATION_LABEL[row.activity.location]} · ordered{' '}
                     <span className="tnum">{row.ordered}</span>/wk
                   </p>
                 </div>
-                <Pill
-                  tone={row.status}
-                  className="hidden shrink-0 sm:inline-flex"
-                >
+                <Pill tone={row.status} className="hidden shrink-0 sm:inline-flex">
                   <span className="tnum">{pct(row.pct)}</span>
                 </Pill>
                 <div className="flex shrink-0 items-center gap-1.5">
@@ -674,7 +696,9 @@ function WeeklyLogCard() {
                       )
                     }
                   />
-                  <span className="text-xs text-slate-400 tnum">/ {row.ordered}</span>
+                  <span className="tnum text-xs font-semibold text-slate-400">
+                    / {row.ordered}
+                  </span>
                 </div>
               </li>
             )
@@ -704,13 +728,13 @@ function WeeklyLogCard() {
 
       {/* Actions */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-slate-400">
+        <p className="text-xs font-semibold text-slate-500">
           {selectedWeek === currentWeek
             ? 'This is the patient’s current week.'
             : `Currently set to week ${currentWeek}.`}
         </p>
         <Button
-          variant="dark"
+          variant="primary"
           onClick={() => actions.setCurrentWeek(selectedWeek)}
           disabled={selectedWeek === currentWeek}
         >

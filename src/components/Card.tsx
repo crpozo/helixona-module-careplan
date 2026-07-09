@@ -12,20 +12,20 @@ interface CardProps {
   children?: ReactNode
 }
 
-/** The default glassy dark container. */
+/** White rounded card with a friendly 2px border. */
 export function Card({ title, subtitle, action, className, flush, children }: CardProps) {
   const hasHeader = title || subtitle || action
   const cls = className ?? ''
   const overridesBg = /(?:^|\s)bg-/.test(cls)
-  const overridesBorder = /(?:^|\s)border-\[|(?:^|\s)border-(?:slate|ink|brand|white|black|emerald|rose|amber|transparent)/.test(
+  const overridesBorder = /(?:^|\s)border-\[|(?:^|\s)border-(?:slate|ink|brand|leaf|white|black|emerald|rose|amber|transparent)/.test(
     cls,
   )
   return (
     <section
       className={cn(
-        'rounded-2xl border backdrop-blur',
-        !overridesBg && 'bg-white/[0.03]',
-        !overridesBorder && 'border-white/[0.07]',
+        'rounded-3xl border-2',
+        !overridesBg && 'bg-white',
+        !overridesBorder && 'border-slate-200',
         flush ? '' : 'p-5',
         className,
       )}
@@ -39,8 +39,10 @@ export function Card({ title, subtitle, action, className, flush, children }: Ca
           )}
         >
           <div className="min-w-0">
-            {title ? <h2 className="text-sm font-semibold text-white">{title}</h2> : null}
-            {subtitle ? <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p> : null}
+            {title ? (
+              <h2 className="text-base font-extrabold text-slate-800">{title}</h2>
+            ) : null}
+            {subtitle ? <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p> : null}
           </div>
           {action && <div className="shrink-0">{action}</div>}
         </header>

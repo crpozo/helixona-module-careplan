@@ -3,6 +3,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppProvider, useApp } from '@/store/store'
 import { AppShell } from '@/components/AppShell'
 import { TodayPage } from '@/pages/TodayPage'
+import { CheckinPage } from '@/pages/CheckinPage'
 
 // Today loads eagerly (it's the landing route); the rest are split into their
 // own chunks so a phone only downloads the page it opens (keeps recharts and
@@ -43,6 +44,8 @@ export function App() {
     <AppProvider>
       <HashRouter>
         <Routes>
+          {/* Full-screen guided check-in — no app chrome, pure focus. */}
+          <Route path="checkin" element={<CheckinPage />} />
           <Route element={<AppShell />}>
             <Route index element={<TodayPage />} />
             <Route

@@ -1,266 +1,169 @@
-import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
-import type { Activity, ActivityLocation } from '@/types'
+import { Check, ChevronRight } from 'lucide-react'
+import type { Activity } from '@/types'
 import { useApp } from '@/store/store'
 import { Card } from '@/components/Card'
 import { Pill } from '@/components/Pill'
 import { IconChip } from '@/components/IconChip'
-import { ProgressBar } from '@/components/ProgressBar'
-import {
-  STAGES,
-  STAGE_BY_KEY,
-  stageProgress,
-  PACING_BY_KEY,
-  CATEGORY_META,
-  LOCATION_LABEL,
-} from '@/lib/plan'
-import { formatDate, plural } from '@/lib/format'
+import { STAGES, STAGE_BY_KEY, CATEGORY_META } from '@/lib/plan'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/cn'
 
-export function PlanPage() {
-  const { state } = useApp()
-  const { plan, patient } = state
-
-  const currentStage = STAGE_BY_KEY[plan.stage]
-  const pacing = PACING_BY_KEY[plan.pacing]
-  const progress = stageProgress(plan.stage)
-
-  const grouped = useMemo(() => {
-    const by: Record<ActivityLocation, Activity[]> = { in_office: [], at_home: [] }
-    for (const a of plan.activities) by[a.location].push(a)
-    return by
-  }, [plan.activities])
-
+/** One activity row: icon, name + tiny detail, and how often per week. */
+function ActivityRow({ activity }: { activity: Activity }) {
   return (
-    <div className="space-y-6">
-      {/* Page hero — visible on mobile; desktop top bar already names the section. */}
-      <header className="lg:hidden">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
-          Plan of Care
+    <li className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-4">
+      <IconChip icon={activity.icon} size="h-12 w-12" iconClassName="h-6 w-6" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-base font-extrabold text-slate-800">{activity.name}</p>
+        <p className="mt-0.5 text-xs font-semibold text-slate-400">
+          {activity.durationMin != null
+            ? `≈${activity.durationMin} min`
+            : CATEGORY_META[activity.category].label}
         </p>
-        <h1 className="text-lg font-bold text-white">Your full plan</h1>
-        <p className="mt-0.5 text-sm text-slate-400">
-          Everything {patient.provider} mapped out for you.
-        </p>
-      </header>
-
-      {/* 1) JOURNEY ----------------------------------------------------------- */}
-      <Card
-        title="Your care journey"
-        subtitle={`Stage ${currentStage.order + 1} of ${STAGES.length} · ${currentStage.label}`}
-      >
-        {/* Horizontal stepper — scrollable on mobile. */}
-        <div className="-mx-1 overflow-x-auto pb-1">
-          <ol className="flex min-w-max items-start gap-1.5 px-1">
-            {STAGES.map((stage, i) => {
-              const isCurrent = stage.key === plan.stage
-              const isDone = stage.order < currentStage.order
-              const StageIcon = getIcon(stage.icon)
-              return (
-                <li key={stage.key} className="flex items-start">
-                  <div className="flex w-16 flex-col items-center gap-1.5 text-center">
-                    <span
-                      className={cn(
-                        'inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors',
-                        isCurrent &&
-                          'border-brand-500 bg-brand-500 text-ink-900 shadow-sm ring-4 ring-brand-500/30',
-                        isDone && 'border-brand-500/30 bg-brand-500/15 text-brand-300',
-                        !isCurrent && !isDone && 'border-white/10 text-slate-500',
-                      )}
-                    >
-                      <StageIcon className="h-5 w-5" />
-                    </span>
-                    <span
-                      className={cn(
-                        'text-[11px] font-semibold leading-tight',
-                        isCurrent && 'text-white',
-                        isDone && 'text-brand-300',
-                        !isCurrent && !isDone && 'text-slate-400',
-                      )}
-                    >
-                      {stage.short}
-                    </span>
-                  </div>
-                  {i < STAGES.length - 1 && (
-                    <span
-                      className={cn(
-                        'mt-5 h-0.5 w-4 rounded-full',
-                        stage.order < currentStage.order ? 'bg-brand-300' : 'bg-white/10',
-                      )}
-                      aria-hidden
-                    />
-                  )}
-                </li>
-              )
-            })}
-          </ol>
-        </div>
-
-        {/* Overall journey progress. */}
-        <div className="mt-5">
-          <div className="mb-1.5 flex items-center justify-between text-xs">
-            <span className="font-medium text-slate-400">Journey progress</span>
-            <span className="tnum font-semibold text-white">{progress}%</span>
-          </div>
-          <ProgressBar value={progress} />
-        </div>
-
-        {/* Current stage description. */}
-        <div className="mt-4 flex items-start gap-3 rounded-xl bg-brand-500/10 p-3.5">
-          <IconChip icon={currentStage.icon} size="h-9 w-9" />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-white">
-              You are here · {currentStage.label}
-            </p>
-            <p className="mt-0.5 text-sm text-slate-300">{currentStage.description}</p>
-          </div>
-        </div>
-      </Card>
-
-      {/* 2) PLAN META --------------------------------------------------------- */}
-      <Card title="Plan details" subtitle="Set by your provider">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* Pacing */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-slate-400">Pacing</p>
-            <div className="mt-1.5 flex items-center gap-2">
-              <IconChip icon={pacing.icon} size="h-7 w-7" className="rounded-lg" />
-              <span className="text-sm font-semibold text-white">{pacing.label}</span>
-            </div>
-            <p className="mt-2 text-sm text-slate-300">{pacing.description}</p>
-          </div>
-
-          {/* Provider + start date */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-slate-400">Your provider</p>
-            <p className="mt-1.5 text-sm font-semibold text-white">{patient.provider}</p>
-            <p className="mt-3 text-xs text-slate-400">Plan started</p>
-            <p className="mt-1 tnum text-sm font-semibold text-white">
-              {formatDate(plan.startDate)}
-            </p>
-          </div>
-
-          {/* Goal */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-slate-400">Your goal</p>
-            <p className="mt-1.5 text-sm font-medium leading-relaxed text-white">
-              {plan.goal}
-            </p>
-          </div>
-
-          {/* Current focus */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-slate-400">Current focus</p>
-            <p className="mt-1.5 text-sm font-medium leading-relaxed text-white">
-              {plan.focus}
-            </p>
-          </div>
-        </div>
-      </Card>
-
-      {/* 3) ACTIVITIES -------------------------------------------------------- */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ActivityGroup title={LOCATION_LABEL.in_office} activities={grouped.in_office} />
-        <ActivityGroup title={LOCATION_LABEL.at_home} activities={grouped.at_home} />
       </div>
+      <Pill tone="neutral" className="shrink-0">
+        <span className="tnum">{activity.timesPerWeek}</span>x / week
+      </Pill>
+    </li>
+  )
+}
 
-      {/* Footer note ---------------------------------------------------------- */}
-      <Link
-        to="/week"
-        className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 shadow-sm transition-colors hover:border-brand-300"
-      >
-        <p className="text-sm text-slate-400">
-          Your plan is set by{' '}
-          <span className="font-semibold text-white">{patient.provider}</span>. Tap{' '}
-          <span className="font-semibold text-brand-300">This Week</span> to track it.
-        </p>
-        <ChevronRight className="h-5 w-5 shrink-0 text-brand-300" aria-hidden />
-      </Link>
+/** A labelled group of activities. Renders nothing when empty. */
+function ActivityGroup({ label, activities }: { label: string; activities: Activity[] }) {
+  if (activities.length === 0) return null
+  return (
+    <div>
+      <p className="mb-2 px-1 text-xs font-extrabold uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
+      <ul className="space-y-3">
+        {activities.map((a) => (
+          <ActivityRow key={a.id} activity={a} />
+        ))}
+      </ul>
     </div>
   )
 }
 
-// --- Activity group card ------------------------------------------------------
+/**
+ * Read-only "My Plan": the goal, a Duolingo-style vertical journey path,
+ * and what to do each week. Calm — no editing, no numbers to worry about.
+ */
+export function PlanPage() {
+  const { state } = useApp()
+  const { plan } = state
+  const isStaff = state.role === 'staff'
 
-function ActivityGroup({
-  title,
-  activities,
-}: {
-  title: string
-  activities: Activity[]
-}) {
-  const subtitle = `${activities.length} ${plural(activities.length, 'activity', 'activities')}`
+  const currentOrder = STAGE_BY_KEY[plan.stage].order
+  const stages = [...STAGES].sort((a, b) => a.order - b.order)
+
+  const clinicActivities = plan.activities.filter((a) => a.location === 'in_office')
+  const homeActivities = plan.activities.filter((a) => a.location === 'at_home')
+
   return (
-    <Card title={title} subtitle={subtitle} flush>
-      {activities.length === 0 ? (
-        <p className="px-5 pb-5 text-sm text-slate-400">No activities in your {title.toLowerCase()} plan.</p>
-      ) : (
-        <ul>
-          {activities.map((a, i) => (
-            <ActivityRow
-              key={a.id}
-              activity={a}
-              first={i === 0}
-              last={i === activities.length - 1}
-            />
-          ))}
-        </ul>
+    <div className="mx-auto max-w-xl space-y-5">
+      {/* 1) Header */}
+      <header className="animate-fade-up pt-2 text-center sm:text-left">
+        <h1 className="text-3xl font-extrabold text-slate-800">My Plan</h1>
+        <p className="mt-1 text-base font-semibold text-slate-500">
+          Your road to feeling better.
+        </p>
+      </header>
+
+      {/* 2) The goal */}
+      <Card className="border-brand-200 bg-brand-50">
+        <p className="text-xs font-extrabold uppercase tracking-wide text-brand-700">
+          Your goal
+        </p>
+        <p className="mt-1.5 text-lg font-extrabold text-slate-800">{plan.goal}</p>
+      </Card>
+
+      {/* 3) The journey — vertical path of stages */}
+      <ol className="px-1">
+        {stages.map((stage, i) => {
+          const isDone = stage.order < currentOrder
+          const isCurrent = stage.order === currentOrder
+          const StageIcon = getIcon(stage.icon)
+          return (
+            <li key={stage.key}>
+              {/* Connector from the node above */}
+              {i > 0 && (
+                <div className="w-14">
+                  <div
+                    className={cn(
+                      'mx-auto h-6 w-1.5 rounded-full',
+                      stages[i - 1].order < currentOrder ? 'bg-leaf-300' : 'bg-slate-200',
+                    )}
+                    aria-hidden
+                  />
+                </div>
+              )}
+              <div className="flex items-center gap-4">
+                <div
+                  className={cn(
+                    'flex h-14 w-14 shrink-0 items-center justify-center rounded-full',
+                    isDone && 'bg-leaf-500 text-white',
+                    isCurrent && 'bg-brand-500 text-ink-800 ring-4 ring-brand-200',
+                    !isDone && !isCurrent && 'bg-slate-100 text-slate-300',
+                  )}
+                >
+                  {isDone ? (
+                    <Check className="h-7 w-7" strokeWidth={3} />
+                  ) : (
+                    <StageIcon className="h-7 w-7" />
+                  )}
+                </div>
+                <div className="min-w-0 py-1">
+                  <p
+                    className={cn(
+                      'font-extrabold',
+                      isDone && 'text-slate-600',
+                      isCurrent && 'text-lg text-brand-800',
+                      !isDone && !isCurrent && 'text-slate-400',
+                    )}
+                  >
+                    {stage.label}
+                  </p>
+                  {isCurrent && (
+                    <>
+                      <Pill tone="brand" className="mt-1">
+                        You are here
+                      </Pill>
+                      <p className="mt-1.5 text-sm font-semibold text-slate-500">
+                        {stage.description}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </li>
+          )
+        })}
+      </ol>
+
+      {/* 4) What you do each week */}
+      <section className="space-y-4">
+        <h2 className="px-1 text-base font-extrabold text-slate-800">
+          What you do each week
+        </h2>
+        <ActivityGroup label="At the clinic" activities={clinicActivities} />
+        <ActivityGroup label="At home" activities={homeActivities} />
+      </section>
+
+      {/* 5) Staff shortcut (staff only) */}
+      {isStaff && (
+        <Link
+          to="/staff"
+          className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-4 transition-colors hover:border-brand-400 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        >
+          <IconChip icon="Stethoscope" size="h-10 w-10" />
+          <span className="flex-1 text-base font-extrabold text-slate-700">
+            Edit this plan (staff)
+          </span>
+          <ChevronRight className="h-5 w-5 text-slate-400" aria-hidden />
+        </Link>
       )}
-    </Card>
-  )
-}
-
-function ActivityRow({
-  activity,
-  first,
-  last,
-}: {
-  activity: Activity
-  first: boolean
-  last: boolean
-}) {
-  const meta = CATEGORY_META[activity.category]
-  return (
-    <li className={cn(!first && 'border-t border-white/5')}>
-      <Link
-        to="/week"
-        className={cn(
-          'group flex items-start gap-3 px-5 py-4 transition-colors hover:bg-white/5',
-          last && 'pb-5',
-        )}
-      >
-      <IconChip icon={activity.icon} size="h-10 w-10" iconClassName="h-5 w-5" />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-sm font-semibold text-white">{activity.name}</span>
-          <span className="text-xs text-slate-400">{meta.label}</span>
-        </div>
-
-        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <Pill tone="brand">
-            <span className="tnum">{activity.timesPerWeek}</span>x / week
-          </Pill>
-          {activity.durationMin != null && (
-            <Pill tone="neutral">
-              <span className="tnum">{activity.durationMin}</span> min
-            </Pill>
-          )}
-          <Pill tone="neutral">
-            <span className="tnum">{activity.points}</span> pts
-          </Pill>
-        </div>
-
-        {activity.instructions && (
-          <p className="mt-2 text-sm text-slate-300">{activity.instructions}</p>
-        )}
-      </div>
-      <ChevronRight
-        className="h-4 w-4 shrink-0 self-center text-slate-500 transition-colors group-hover:text-brand-500"
-        aria-hidden
-      />
-      </Link>
-    </li>
+    </div>
   )
 }

@@ -21,7 +21,7 @@ interface KpiCardProps {
   badge?: ReactNode
 }
 
-/** Glassy dark stat card. Optionally clickable. */
+/** White stat card with a 2px border. Optionally clickable. */
 export function KpiCard({
   label,
   value,
@@ -40,9 +40,9 @@ export function KpiCard({
   const interactive = Boolean(to || onClick)
 
   const base = cn(
-    'group block w-full rounded-2xl border border-white/[0.07] bg-white/[0.03] p-4 text-left backdrop-blur transition-colors',
+    'group block w-full rounded-3xl border-2 border-slate-200 bg-white p-4 text-left transition-colors',
     interactive &&
-      'cursor-pointer hover:border-brand-500/40 hover:bg-white/[0.055] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
+      'cursor-pointer hover:border-brand-400 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
     className,
   )
 
@@ -51,17 +51,17 @@ export function KpiCard({
   ) : delta ? (
     <span
       className={cn(
-        'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold',
-        isGood === null && 'bg-white/5 text-slate-300',
-        isGood === true && 'bg-emerald-500/15 text-emerald-300',
-        isGood === false && 'bg-rose-500/15 text-rose-300',
+        'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-bold',
+        isGood === null && 'bg-slate-100 text-slate-600',
+        isGood === true && 'bg-leaf-100 text-leaf-700',
+        isGood === false && 'bg-rose-100 text-rose-600',
       )}
     >
       <TrendIcon className="h-3 w-3" />
       {delta}
     </span>
   ) : interactive ? (
-    <ChevronRight className="h-4 w-4 text-slate-500 transition-colors group-hover:text-brand-400" />
+    <ChevronRight className="h-4 w-4 text-slate-400 transition-colors group-hover:text-brand-700" />
   ) : null
 
   const inner = (
@@ -70,9 +70,9 @@ export function KpiCard({
         {icon ? <IconChip icon={icon} size="h-10 w-10" /> : <span />}
         {topRight}
       </div>
-      <p className="mt-4 text-xs font-medium text-slate-400">{label}</p>
-      <div className="mt-1 text-2xl font-bold tracking-tight text-white tnum">{value}</div>
-      {hint && <p className="mt-1.5 text-[11px] text-slate-500">{hint}</p>}
+      <p className="mt-4 text-sm font-bold text-slate-500">{label}</p>
+      <div className="mt-1 text-2xl font-extrabold tracking-tight text-slate-800 tnum">{value}</div>
+      {hint && <p className="mt-1.5 text-xs text-slate-500">{hint}</p>}
     </>
   )
 

@@ -17,7 +17,20 @@ export default {
           800: '#7a6234',
           900: '#5a4827',
         },
-        // Ink / near-black — dark surfaces, sidebar.
+        // Friendly success green — done states, "I did it" actions.
+        leaf: {
+          50: '#f2fbe8',
+          100: '#e4f6d2',
+          200: '#c8eda6',
+          300: '#a4e072',
+          400: '#7cd53b',
+          500: '#58cc02',
+          600: '#46a302',
+          700: '#3a8503',
+          800: '#2f6a06',
+          900: '#265408',
+        },
+        // Ink / near-black — kept for dark accents (staff chip, logo text).
         ink: {
           700: '#1c1c1c',
           800: '#111111',
@@ -26,7 +39,7 @@ export default {
       },
       fontFamily: {
         sans: [
-          'Inter',
+          'Nunito',
           'system-ui',
           '-apple-system',
           'Segoe UI',
@@ -56,6 +69,14 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.4' },
         },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-6deg)' },
+          '50%': { transform: 'rotate(6deg)' },
+        },
+        'float-up': {
+          '0%': { transform: 'translateY(0)', opacity: '1' },
+          '100%': { transform: 'translateY(-32px)', opacity: '0' },
+        },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
@@ -65,6 +86,8 @@ export default {
         'pop-in': 'pop-in 0.35s ease-out',
         'fade-up': 'fade-up 0.4s ease-out',
         'ring-pulse': 'ring-pulse 1.8s ease-in-out infinite',
+        wiggle: 'wiggle 0.8s ease-in-out infinite',
+        'float-up': 'float-up 0.9s ease-out forwards',
         shimmer: 'shimmer 2.5s linear infinite',
       },
     },

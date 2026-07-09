@@ -1,41 +1,42 @@
-// Chart + semantic color tokens for the DARK gold theme.
+// Chart + semantic color tokens for the LIGHT theme (white background).
 
 export const COLORS = {
-  brand: '#d6b981',
-  brandSoft: '#e8d7b4',
-  ink: '#e7e5e4', // light "ink" so text/series read on dark
-  accent: '#c2a163',
-  emerald: '#34d399',
-  amber: '#fbbf24',
-  rose: '#fb7185',
-  slate: '#94a3b8',
-  grid: 'rgba(255,255,255,0.06)',
+  brand: '#c2a163', // gold that reads on white
+  brandSoft: '#d6b981',
+  ink: '#3f3f46',
+  accent: '#9c7e44',
+  emerald: '#58cc02',
+  amber: '#f59e0b',
+  rose: '#f43f5e',
+  slate: '#64748b',
+  grid: 'rgba(0,0,0,0.06)',
   axis: '#94a3b8',
 } as const
 
-// Categorical palette — gold family, tuned brighter for dark backgrounds.
+// Categorical palette — gold family, tuned darker for white backgrounds.
 export const CATEGORICAL = [
-  '#d6b981',
-  '#e8d7b4',
-  '#b08d4f',
   '#c2a163',
-  '#8a6d3b',
-  '#9ca3af',
+  '#d6b981',
+  '#9c7e44',
+  '#e0cba0',
+  '#7a6234',
+  '#94a3b8',
 ] as const
 
-// Adherence intensity buckets (bright gold = best on dark).
+// Adherence intensity buckets. Green = doing great (encouraging, Duolingo-ish);
+// never punish with red — low weeks are just gray "not started yet".
 export function adherenceColor(pct: number): string {
-  if (pct >= 90) return '#e8d7b4' // bright gold — excellent
-  if (pct >= 75) return '#d6b981' // gold — on track
-  if (pct >= 50) return '#b08d4f' // bronze — watch
-  return '#52525b' // dim slate — behind
+  if (pct >= 90) return '#58cc02' // bright green — excellent
+  if (pct >= 75) return '#7cd53b' // green — on track
+  if (pct >= 50) return '#f5a623' // warm amber — getting there
+  return '#cbd5e1' // light slate — just starting
 }
 
-// Semantic status -> tailwind chip classes (soft tints on dark).
+// Semantic status -> tailwind chip classes (soft tints on white).
 export const STATUS_CHIP: Record<string, string> = {
-  good: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/20',
-  watch: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/20',
-  bad: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/20',
-  brand: 'bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/25',
-  neutral: 'bg-white/5 text-slate-300 ring-1 ring-white/10',
+  good: 'bg-leaf-100 text-leaf-700 ring-1 ring-leaf-200',
+  watch: 'bg-amber-100 text-amber-700 ring-1 ring-amber-200',
+  bad: 'bg-rose-100 text-rose-600 ring-1 ring-rose-200',
+  brand: 'bg-brand-100 text-brand-800 ring-1 ring-brand-200',
+  neutral: 'bg-slate-100 text-slate-600 ring-1 ring-slate-200',
 }

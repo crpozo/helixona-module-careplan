@@ -12,24 +12,31 @@ they need to do each week, watch their progress, and earn points, badges and
 
 ---
 
+The UI is deliberately **simple and step-by-step (Duolingo-style)**: white
+background, one idea per screen, big friendly buttons. Many patients live with
+brain fog, so every patient-facing screen shows as little as possible at once.
+
 ## What it does
 
-- **Today** — a warm home screen: this week's adherence ring, streak, tier,
-  today's at-home to-dos (one-tap to log), next appointments and a reward nudge.
-- **My Plan** — the full POC: the care **journey** (Identification → Stabilization
-  → Lead Actor 1/2/3 → Repair → Graduation), the **pacing** (Gentle / Standard /
-  Aggressive), the goal & focus, and every in-office + at-home activity with its
-  ordered frequency.
-- **This Week** — the engagement loop: a checklist of every activity with
-  ordered-vs-actual and a +/− stepper to log completions, plus a "Total" line
-  that mirrors the clinic's POC sheet (e.g. _Total Treatment 8 / 3 / 37.5%_).
-- **Progress** — weekly adherence trend, per-activity adherence, points per week
-  and the stage journey, all on-brand (Recharts).
-- **Rewards** — the gamification hub: points balance & tier, a catalog of
-  redeemable **gift cards and treatment discounts**, redemption codes, and an
-  achievements/badge wall.
+- **Today** — a minimal home: a greeting, one ring with "N things left", one
+  big **Start today's check-in** button, and three glanceable tiles (streak,
+  points, week).
+- **Check-in** (`/checkin`) — the heart of the app: a full-screen guided flow
+  that shows **one activity at a time** with two big answers — **"I did it!"**
+  and **"Not yet"** — a progress bar on top, and a celebration screen at the
+  end.
+- **My Plan** — the goal in the patient's words, the care **journey**
+  (Identification → Stabilization → Lead Actor 1/2/3 → Repair → Graduation) as
+  a vertical path with "You are here", and the weekly activity list.
+- **This Week** — direct logging: one row per activity with progress dots and
+  a big **+** button; rows turn green when done.
+- **Progress** — this week's ring, the streak, and a simple week-by-week bar
+  list. No charts to decode.
+- **Rewards** — points balance & tier, a catalog of redeemable **gift cards
+  and treatment discounts**, redemption codes, and the badge wall.
 - **Staff Entry** — the manual data-entry workhorse for clinic employees: set
   the stage/pacing/goal, edit activities, and log each week's actual visits.
+  Only the **Staff** role can open it (role switch in the header/sidebar).
 
 ## Gamification
 
@@ -47,9 +54,10 @@ they need to do each week, watch their progress, and earn points, badges and
 ## Tech
 
 - **Vite + React 18 + TypeScript**, **React Router**, **Tailwind CSS**,
-  **Recharts**, **lucide-react**.
-- Design system follows **`STYLE.md`** — a luxe **gold / black / white** clinical
-  aesthetic (`brand` + `ink` palettes).
+  **lucide-react**.
+- Design system: a **light, Duolingo-inspired** look — white canvas, Nunito,
+  chunky press-down buttons, 2px-bordered cards — in the Helixona **gold**
+  palette (`brand`) with a friendly success green (`leaf`).
 - State lives in a small reducer-backed store (`src/store/store.tsx`) and
   **persists to `localStorage`**, so the demo keeps your progress between visits.
 - All derived numbers (adherence, points, tiers, streaks, badges) are pure
@@ -58,7 +66,7 @@ they need to do each week, watch their progress, and earn points, badges and
 ## Live demo
 
 Deployed to GitHub Pages: **https://crpozo.github.io/helixona-module-careplan/**
-(published by `.github/workflows/deploy-pages.yml` on every push).
+(served from the committed `docs/` folder on `main` — "Deploy from a branch").
 
 ## Getting started
 

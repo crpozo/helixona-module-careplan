@@ -10,18 +10,18 @@ interface IconChipProps {
   iconClassName?: string
 }
 
-/** Circular glassy icon chip with a gold glyph. */
+/** Rounded squircle icon chip — soft gold tint on white. */
 export function IconChip({
   icon,
   className,
   size = 'h-10 w-10',
-  iconClassName = 'h-4 w-4',
+  iconClassName = 'h-5 w-5',
 }: IconChipProps) {
   const Icon = getIcon(icon)
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-brand-300 ring-1 ring-white/10',
+        'inline-flex shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-brand-800',
         size,
         className,
       )}
