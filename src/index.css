@@ -30,6 +30,14 @@ body {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* Full-height app screens (check-in, login). `dvh` tracks the REAL visible
+   viewport on mobile — plain 100vh includes the URL bar and pushes the
+   bottom buttons off screen. */
+.h-viewport {
+  height: 100vh;
+  height: 100dvh;
+}
 /* Room for the fixed mobile bottom tab bar. */
 .pb-safe-nav {
   padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));

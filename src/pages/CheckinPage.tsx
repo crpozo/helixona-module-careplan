@@ -78,8 +78,8 @@ export function CheckinPage() {
     const nothingToDo = steps.length === 0
     const restedInstead = !nothingToDo && didCount === 0
     return (
-      <div className="flex min-h-screen flex-col bg-white">
-        <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-6 text-center">
+      <div className="h-viewport flex flex-col bg-white">
+        <main className="mx-auto flex w-full max-w-md min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-6 text-center">
           <div
             className={cn(
               'flex h-32 w-32 animate-pop-in items-center justify-center rounded-[2.5rem]',
@@ -112,7 +112,7 @@ export function CheckinPage() {
                 : `You checked off ${num(didCount)} ${plural(didCount, 'activity', 'activities')}. Keep it up!`}
           </p>
         </main>
-        <footer className="safe-bottom mx-auto w-full max-w-md px-6 pb-8">
+        <footer className="safe-bottom mx-auto w-full max-w-md shrink-0 px-6 pb-6">
           <Button
             variant="primary"
             size="xl"
@@ -131,8 +131,8 @@ export function CheckinPage() {
   const dotsDone = step.doneAtStart + (justDid !== null ? 1 : 0)
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="mx-auto flex w-full max-w-xl items-center gap-3 px-4 pt-5">
+    <div className="h-viewport flex flex-col bg-white">
+      <header className="mx-auto flex w-full max-w-xl shrink-0 items-center gap-3 px-4 pt-4">
         <Link
           to="/"
           aria-label="Exit check-in"
@@ -145,7 +145,7 @@ export function CheckinPage() {
 
       <main
         key={step.id}
-        className="mx-auto flex w-full max-w-xl flex-1 animate-fade-up flex-col items-center justify-center px-6 py-8 text-center"
+        className="mx-auto flex w-full max-w-xl min-h-0 flex-1 animate-fade-up flex-col items-center justify-center overflow-y-auto px-6 py-6 text-center"
       >
         <p className="text-sm font-extrabold uppercase tracking-wide text-slate-400 tnum">
           Step {idx + 1} of {steps.length}
@@ -191,7 +191,7 @@ export function CheckinPage() {
         )}
       </main>
 
-      <footer className="safe-bottom mx-auto w-full max-w-xl space-y-3 px-6 pb-8">
+      <footer className="safe-bottom mx-auto w-full max-w-xl shrink-0 space-y-3 px-6 pb-6">
         <Button
           variant="primary"
           size="xl"
