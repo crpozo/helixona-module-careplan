@@ -74,7 +74,7 @@ export function RewardsPage() {
                 <p className="mt-0.5 text-sm font-bold text-slate-500 tnum">{num(r.cost)} pts</p>
                 {affordable ? (
                   <Button
-                    variant="success"
+                    variant="primary"
                     className="mt-3 w-full"
                     onClick={() => actions.redeem(r.id)}
                   >

@@ -53,7 +53,7 @@ export function KpiCard({
       className={cn(
         'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-bold',
         isGood === null && 'bg-slate-100 text-slate-600',
-        isGood === true && 'bg-leaf-100 text-leaf-700',
+        isGood === true && 'bg-brand-100 text-brand-800',
         isGood === false && 'bg-rose-100 text-rose-600',
       )}
     >

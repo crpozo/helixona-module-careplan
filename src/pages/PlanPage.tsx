@@ -93,7 +93,7 @@ export function PlanPage() {
                   <div
                     className={cn(
                       'mx-auto h-6 w-1.5 rounded-full',
-                      stages[i - 1].order < currentOrder ? 'bg-leaf-300' : 'bg-slate-200',
+                      stages[i - 1].order < currentOrder ? 'bg-brand-300' : 'bg-slate-200',
                     )}
                     aria-hidden
                   />
@@ -103,7 +103,7 @@ export function PlanPage() {
                 <div
                   className={cn(
                     'flex h-14 w-14 shrink-0 items-center justify-center rounded-full',
-                    isDone && 'bg-leaf-500 text-white',
+                    isDone && 'bg-brand-500 text-ink-800',
                     isCurrent && 'bg-brand-500 text-ink-800 ring-4 ring-brand-200',
                     !isDone && !isCurrent && 'bg-slate-100 text-slate-300',
                   )}

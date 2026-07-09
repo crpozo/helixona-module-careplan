@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Coins, Flame } from 'lucide-react'
+import { Coins, Flame, LogOut } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { getIcon } from '@/lib/icons'
 import { num } from '@/lib/format'
@@ -7,7 +7,6 @@ import { Logo } from '@/components/Logo'
 import { Avatar } from '@/components/Avatar'
 import { PATIENT_NAV, STAFF_NAV, type NavItem } from '@/components/nav'
 import { useApp, useDerived } from '@/store/store'
-import type { UserRole } from '@/types'
 
 function PointsChip() {
   const { points } = useDerived()
@@ -37,40 +36,25 @@ function StreakChip() {
   )
 }
 
-/** Patient/Staff role switcher (demo: simulates the two distinct users). */
-function RoleSwitch({
-  role,
-  onChange,
-  className,
-}: {
-  role: UserRole
-  onChange: (r: UserRole) => void
-  className?: string
-}) {
+/** Sign out and return to the login screen. */
+function LogoutButton({ compact, className }: { compact?: boolean; className?: string }) {
+  const { actions } = useApp()
   return (
-    <div
+    <button
+      type="button"
+      onClick={actions.logout}
+      aria-label="Log out"
+      title="Log out"
       className={cn(
-        'inline-flex items-center rounded-full border-2 border-slate-200 bg-slate-100 p-0.5 text-xs font-extrabold',
+        'inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white font-extrabold text-slate-500 transition-colors hover:border-brand-400 hover:text-brand-800',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
+        compact ? 'h-9 w-9' : 'px-3 py-2 text-xs',
         className,
       )}
-      role="group"
-      aria-label="Switch user role"
     >
-      {(['patient', 'staff'] as const).map((r) => (
-        <button
-          key={r}
-          type="button"
-          onClick={() => onChange(r)}
-          aria-pressed={role === r}
-          className={cn(
-            'flex-1 rounded-full px-3 py-1 transition-colors',
-            role === r ? 'bg-white text-brand-800 shadow-soft' : 'text-slate-500 hover:text-slate-700',
-          )}
-        >
-          {r === 'staff' ? 'Staff' : 'Patient'}
-        </button>
-      ))}
-    </div>
+      <LogOut className="h-4 w-4" />
+      {!compact && 'Log out'}
+    </button>
   )
 }
 
@@ -118,7 +102,7 @@ function TabLink({ item }: { item: NavItem }) {
 }
 
 export function AppShell() {
-  const { state, actions } = useApp()
+  const { state } = useApp()
   const { level } = useDerived()
   const isStaff = state.role === 'staff'
   const TierIcon = getIcon(level.icon)
@@ -158,11 +142,21 @@ export function AppShell() {
               {level.nextTier ? `${num(level.toNext)} pts to ${level.nextTier}` : 'Top tier reached'}
             </p>
           </div>
-          <div>
-            <p className="px-1 pb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-              Viewing as
-            </p>
-            <RoleSwitch role={state.role} onChange={actions.setRole} className="flex w-full" />
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-slate-200 bg-white p-2">
+            <Avatar
+              firstName={state.patient.firstName}
+              lastName={state.patient.lastName}
+              size="h-9 w-9"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-extrabold text-slate-700">
+                {isStaff ? 'Clinic staff' : state.patient.firstName}
+              </p>
+              <p className="text-[10px] font-bold text-slate-400">
+                {isStaff ? 'Staff account' : 'Patient'}
+              </p>
+            </div>
+            <LogoutButton compact />
           </div>
         </div>
       </aside>
@@ -177,22 +171,14 @@ export function AppShell() {
             <div className="ml-auto flex items-center gap-2">
               <StreakChip />
               <PointsChip />
-              <RoleSwitch
-                role={state.role}
-                onChange={actions.setRole}
-                className="hidden sm:inline-flex lg:hidden"
-              />
               <Avatar
                 firstName={state.patient.firstName}
                 lastName={state.patient.lastName}
                 size="h-9 w-9"
                 className="hidden sm:inline-flex"
               />
+              <LogoutButton compact className="lg:hidden" />
             </div>
-          </div>
-          {/* Extra-small screens: role switch gets its own row so nothing crowds. */}
-          <div className="mx-auto flex w-full max-w-3xl justify-end px-4 pb-2 sm:hidden">
-            <RoleSwitch role={state.role} onChange={actions.setRole} />
           </div>
         </header>
 

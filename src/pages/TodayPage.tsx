@@ -80,7 +80,7 @@ export function TodayPage() {
         <div className="flex flex-col items-center gap-5 text-center">
           <ProgressRing value={adherence.pct} size={128} stroke={14}>
             {allDone ? (
-              <Check className="h-12 w-12 text-leaf-500" strokeWidth={3} />
+              <Check className="h-12 w-12 text-brand-600" strokeWidth={3} />
             ) : (
               <>
                 <span className="text-4xl font-extrabold text-slate-800 tnum">{remaining}</span>
@@ -109,7 +109,7 @@ export function TodayPage() {
             </Link>
           ) : (
             <Link to="/checkin" className="w-full">
-              <Button variant="success" size="xl" className="w-full">
+              <Button variant="primary" size="xl" className="w-full">
                 Start today's check-in
                 <ChevronRight className="h-5 w-5" />
               </Button>

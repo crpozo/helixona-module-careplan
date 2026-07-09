@@ -4,6 +4,7 @@ import { AppProvider, useApp } from '@/store/store'
 import { AppShell } from '@/components/AppShell'
 import { TodayPage } from '@/pages/TodayPage'
 import { CheckinPage } from '@/pages/CheckinPage'
+import { LoginPage } from '@/pages/LoginPage'
 
 // Today loads eagerly (it's the landing route); the rest are split into their
 // own chunks so a phone only downloads the page it opens (keeps recharts and
@@ -39,13 +40,15 @@ function RequireStaff({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
-export function App() {
+/** Everything behind the login gate: the router + app chrome. */
+function AuthenticatedApp() {
+  const { state } = useApp()
+  if (!state.authenticated) return <LoginPage />
   return (
-    <AppProvider>
-      <HashRouter>
-        <Routes>
-          {/* Full-screen guided check-in — no app chrome, pure focus. */}
-          <Route path="checkin" element={<CheckinPage />} />
+    <HashRouter>
+      <Routes>
+        {/* Full-screen guided check-in — no app chrome, pure focus. */}
+        <Route path="checkin" element={<CheckinPage />} />
           <Route element={<AppShell />}>
             <Route index element={<TodayPage />} />
             <Route
@@ -92,8 +95,15 @@ export function App() {
             />
             <Route path="*" element={<TodayPage />} />
           </Route>
-        </Routes>
-      </HashRouter>
+      </Routes>
+    </HashRouter>
+  )
+}
+
+export function App() {
+  return (
+    <AppProvider>
+      <AuthenticatedApp />
     </AppProvider>
   )
 }

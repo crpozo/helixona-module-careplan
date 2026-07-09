@@ -454,6 +454,7 @@ export const BADGES: BadgeDef[] = [
 
 export function createSeedState(): AppState {
   return {
+    authenticated: false,
     role: 'patient',
     patient: {
       id: 'pt-001',

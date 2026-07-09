@@ -12,12 +12,17 @@ they need to do each week, watch their progress, and earn points, badges and
 
 ---
 
-The UI is deliberately **simple and step-by-step (Duolingo-style)**: white
-background, one idea per screen, big friendly buttons. Many patients live with
-brain fog, so every patient-facing screen shows as little as possible at once.
+The UI is deliberately **simple and step-by-step** (guided like Duolingo, but
+in Helixona's own all-gold identity): white background, one idea per screen,
+big friendly buttons. Many patients live with brain fog, so every
+patient-facing screen shows as little as possible at once.
 
 ## What it does
 
+- **Login** — the entry gate: two tabs (**I'm a patient** / **Clinic staff**)
+  and one big sign-in button (demo auth — any password works). The tab decides
+  the role: patients land on Today, staff land on their console. Log out from
+  the header/sidebar.
 - **Today** — a minimal home: a greeting, one ring with "N things left", one
   big **Start today's check-in** button, and three glanceable tiles (streak,
   points, week).
@@ -36,7 +41,7 @@ brain fog, so every patient-facing screen shows as little as possible at once.
   and treatment discounts**, redemption codes, and the badge wall.
 - **Staff Entry** — the manual data-entry workhorse for clinic employees: set
   the stage/pacing/goal, edit activities, and log each week's actual visits.
-  Only the **Staff** role can open it (role switch in the header/sidebar).
+  Only the **Staff** login can open it.
 
 ## Gamification
 
@@ -55,9 +60,9 @@ brain fog, so every patient-facing screen shows as little as possible at once.
 
 - **Vite + React 18 + TypeScript**, **React Router**, **Tailwind CSS**,
   **lucide-react**.
-- Design system: a **light, Duolingo-inspired** look — white canvas, Nunito,
-  chunky press-down buttons, 2px-bordered cards — in the Helixona **gold**
-  palette (`brand`) with a friendly success green (`leaf`).
+- Design system: a **light, guided** look — white canvas, Nunito, chunky
+  press-down buttons, 2px-bordered cards — entirely in the Helixona **gold**
+  palette (`brand`); done/success states are gold, never green.
 - State lives in a small reducer-backed store (`src/store/store.tsx`) and
   **persists to `localStorage`**, so the demo keeps your progress between visits.
 - All derived numbers (adherence, points, tiers, streaks, badges) are pure

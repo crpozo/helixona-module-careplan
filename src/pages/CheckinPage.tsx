@@ -83,7 +83,7 @@ export function CheckinPage() {
           <div
             className={cn(
               'flex h-32 w-32 animate-pop-in items-center justify-center rounded-[2.5rem]',
-              restedInstead ? 'bg-brand-100 text-brand-700' : 'bg-leaf-100 text-leaf-600',
+              restedInstead ? 'bg-brand-100 text-brand-700' : 'bg-brand-100 text-brand-700',
             )}
           >
             {restedInstead ? (
@@ -114,7 +114,7 @@ export function CheckinPage() {
         </main>
         <footer className="safe-bottom mx-auto w-full max-w-md px-6 pb-8">
           <Button
-            variant={restedInstead ? 'primary' : 'success'}
+            variant="primary"
             size="xl"
             className="w-full"
             onClick={() => navigate('/')}
@@ -155,7 +155,7 @@ export function CheckinPage() {
           <div
             className={cn(
               'flex h-28 w-28 items-center justify-center rounded-[2rem] transition-colors',
-              justDid !== null ? 'bg-leaf-100 text-leaf-600' : 'bg-brand-100 text-brand-700',
+              justDid !== null ? 'bg-brand-100 text-brand-700' : 'bg-brand-100 text-brand-700',
             )}
           >
             {justDid !== null ? (
@@ -165,7 +165,7 @@ export function CheckinPage() {
             )}
           </div>
           {justDid !== null && justDid > 0 && (
-            <span className="absolute -right-4 -top-2 animate-float-up text-xl font-extrabold text-leaf-600 tnum">
+            <span className="absolute -right-4 -top-2 animate-float-up text-xl font-extrabold text-brand-700 tnum">
               +{num(justDid)}
             </span>
           )}
@@ -193,7 +193,7 @@ export function CheckinPage() {
 
       <footer className="safe-bottom mx-auto w-full max-w-xl space-y-3 px-6 pb-8">
         <Button
-          variant="success"
+          variant="primary"
           size="xl"
           className="w-full"
           onClick={onDidIt}

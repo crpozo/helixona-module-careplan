@@ -17,7 +17,7 @@ export function Card({ title, subtitle, action, className, flush, children }: Ca
   const hasHeader = title || subtitle || action
   const cls = className ?? ''
   const overridesBg = /(?:^|\s)bg-/.test(cls)
-  const overridesBorder = /(?:^|\s)border-\[|(?:^|\s)border-(?:slate|ink|brand|leaf|white|black|emerald|rose|amber|transparent)/.test(
+  const overridesBorder = /(?:^|\s)border-\[|(?:^|\s)border-(?:slate|ink|brand|white|black|emerald|rose|amber|transparent)/.test(
     cls,
   )
   return (

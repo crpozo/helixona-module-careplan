@@ -25,7 +25,7 @@ function ActivityRow({
     <div
       className={cn(
         'flex items-center gap-3 rounded-3xl border-2 p-4',
-        done ? 'border-leaf-200 bg-leaf-50' : 'border-slate-200 bg-white',
+        done ? 'border-brand-200 bg-brand-50' : 'border-slate-200 bg-white',
       )}
     >
       <IconChip icon={activity.icon} size="h-12 w-12" iconClassName="h-6 w-6" />
@@ -50,7 +50,7 @@ function ActivityRow({
         <span
           role="img"
           aria-label={`${activity.name} completed`}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-leaf-500 text-white"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-500 text-ink-800"
         >
           <Check className="h-6 w-6" strokeWidth={3} />
         </span>
@@ -59,7 +59,7 @@ function ActivityRow({
           type="button"
           onClick={() => onLog(1)}
           aria-label={`Log ${activity.name}`}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-leaf-500 text-white shadow-[0_4px_0_#46a302] transition-all hover:bg-leaf-400 active:translate-y-1 active:shadow-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-500 text-ink-800 shadow-[0_4px_0_#9c7e44] transition-all hover:bg-brand-400 active:translate-y-1 active:shadow-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
         >
           <Plus className="h-6 w-6" strokeWidth={3} />
         </button>
@@ -116,22 +116,22 @@ export function WeekPage() {
         <>
           {/* Bridge to the guided flow — or a little party when done */}
           {allDone ? (
-            <Card className="border-leaf-200 bg-leaf-50">
+            <Card className="border-brand-200 bg-brand-50">
               <div className="flex flex-col items-center gap-2 text-center">
-                <PartyPopper className="h-8 w-8 text-leaf-600" />
+                <PartyPopper className="h-8 w-8 text-brand-700" />
                 <p className="text-lg font-extrabold text-slate-800">
                   All done for this week! 🎉
                 </p>
               </div>
             </Card>
           ) : (
-            <Card className="border-leaf-200 bg-leaf-50">
+            <Card className="border-brand-200 bg-brand-50">
               <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
                 <p className="text-base font-extrabold text-slate-800">
                   Prefer one step at a time?
                 </p>
                 <Link to="/checkin" className="shrink-0">
-                  <Button variant="success" size="lg">
+                  <Button variant="primary" size="lg">
                     Start check-in
                   </Button>
                 </Link>

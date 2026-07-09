@@ -182,6 +182,8 @@ export interface CarePlan {
 
 /** The full persisted application state (single patient context). */
 export interface AppState {
+  /** Whether someone is signed in (login screen shows until true). */
+  authenticated: boolean
   /** Current viewer. Patients can't edit the plan; staff can. */
   role: UserRole
   patient: Patient

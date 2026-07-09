@@ -538,7 +538,7 @@ function AddActivityForm() {
       </div>
 
       <div className="mt-3 flex justify-end">
-        <Button variant="success" onClick={add} disabled={!canAdd}>
+        <Button variant="primary" onClick={add} disabled={!canAdd}>
           <Plus className="h-4 w-4" />
           Add activity
         </Button>

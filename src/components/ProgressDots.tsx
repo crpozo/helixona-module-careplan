@@ -39,7 +39,7 @@ export function ProgressDots({ total, done, className }: ProgressDotsProps) {
           key={i}
           className={cn(
             'inline-flex h-6 w-6 items-center justify-center rounded-full transition-colors',
-            i < clampedDone ? 'bg-leaf-500 text-white' : 'bg-slate-200',
+            i < clampedDone ? 'bg-brand-500 text-ink-800' : 'bg-slate-200',
           )}
         >
           {i < clampedDone && <Check className="h-3.5 w-3.5" strokeWidth={3.5} />}

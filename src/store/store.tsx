@@ -47,6 +47,8 @@ type Action =
   | { type: 'SET_WEEK_NOTE'; weekNumber: number; note: string }
   | { type: 'SET_ADHERENCE_TARGET'; value: number }
   | { type: 'SET_ROLE'; role: UserRole }
+  | { type: 'LOGIN'; role: UserRole }
+  | { type: 'LOGOUT' }
   | { type: 'RESET' }
 
 function orderedFor(state: AppState, activityId: string): number {
@@ -181,8 +183,12 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, adherenceTarget: clamp(Math.round(action.value), 10, 100) }
     case 'SET_ROLE':
       return { ...state, role: action.role }
+    case 'LOGIN':
+      return { ...state, role: action.role, authenticated: true }
+    case 'LOGOUT':
+      return { ...state, authenticated: false }
     case 'RESET':
-      return { ...createSeedState(), role: state.role }
+      return { ...createSeedState(), role: state.role, authenticated: state.authenticated }
     default:
       return state
   }
@@ -200,8 +206,12 @@ function loadState(): AppState {
     if (!parsed.patient || !parsed.plan || !Array.isArray(parsed.weeks)) {
       return createSeedState()
     }
-    // Migrate older saves that predate the role field.
-    return { ...(parsed as AppState), role: parsed.role ?? 'patient' }
+    // Migrate older saves that predate the role/auth fields.
+    return {
+      ...(parsed as AppState),
+      role: parsed.role ?? 'patient',
+      authenticated: parsed.authenticated ?? false,
+    }
   } catch {
     return createSeedState()
   }
@@ -254,6 +264,10 @@ function makeActions(state: AppState, dispatch: React.Dispatch<Action>) {
     setAdherenceTarget: (value: number) =>
       dispatch({ type: 'SET_ADHERENCE_TARGET', value }),
     setRole: (role: UserRole) => dispatch({ type: 'SET_ROLE', role }),
+    /** Sign in as the given role (demo auth — no real credentials). */
+    login: (role: UserRole) => dispatch({ type: 'LOGIN', role }),
+    /** Sign out and return to the login screen. */
+    logout: () => dispatch({ type: 'LOGOUT' }),
     reset: () => dispatch({ type: 'RESET' }),
   }
 }

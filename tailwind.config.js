@@ -17,19 +17,6 @@ export default {
           800: '#7a6234',
           900: '#5a4827',
         },
-        // Friendly success green — done states, "I did it" actions.
-        leaf: {
-          50: '#f2fbe8',
-          100: '#e4f6d2',
-          200: '#c8eda6',
-          300: '#a4e072',
-          400: '#7cd53b',
-          500: '#58cc02',
-          600: '#46a302',
-          700: '#3a8503',
-          800: '#2f6a06',
-          900: '#265408',
-        },
         // Ink / near-black — kept for dark accents (staff chip, logo text).
         ink: {
           700: '#1c1c1c',
