@@ -5,6 +5,7 @@ import { useApp } from '@/store/store'
 import { Card } from '@/components/Card'
 import { Pill } from '@/components/Pill'
 import { IconChip } from '@/components/IconChip'
+import { LearnTip } from '@/components/LearnTip'
 import { STAGES, STAGE_BY_KEY, CATEGORY_META, isSupplementLike } from '@/lib/plan'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/cn'
@@ -23,6 +24,7 @@ function ActivityRow({ activity }: { activity: Activity }) {
               : CATEGORY_META[activity.category].label)}
         </p>
       </div>
+      <LearnTip activity={activity} />
       <Pill tone="neutral" className="shrink-0">
         <span className="tnum">{activity.timesPerWeek}</span>x / week
       </Pill>

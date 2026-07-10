@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Check, PartyPopper, Sparkles, X } from 'lucide-react'
+import type { Activity } from '@/types'
 import { useApp } from '@/store/store'
 import { LOCATION_LABEL, isSupplementLike } from '@/lib/plan'
 import { isDoneOnDay, isScheduledOn, weekdayIndex } from '@/lib/schedule'
@@ -9,6 +10,7 @@ import { getIcon } from '@/lib/icons'
 import { sfx } from '@/lib/sound'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/Button'
+import { LearnTip } from '@/components/LearnTip'
 import { Pill } from '@/components/Pill'
 import { ProgressBar } from '@/components/ProgressBar'
 
@@ -16,6 +18,7 @@ interface Step {
   id: string
   name: string
   icon: string
+  category: Activity['category']
   location: 'in_office' | 'at_home'
   /** "Take" wording + dose chip for supplements/medications. */
   isMed: boolean
@@ -43,6 +46,7 @@ export function CheckinPage() {
         id: a.id,
         name: a.name,
         icon: a.icon,
+        category: a.category,
         location: a.location,
         isMed: isSupplementLike(a.category),
         dose: a.dose,
@@ -194,6 +198,7 @@ export function CheckinPage() {
             {LOCATION_LABEL[step.location]}
           </Pill>
           {step.dose && <Pill tone="neutral">{step.dose}</Pill>}
+          <LearnTip activity={step} label="What is this?" />
         </div>
 
         {step.instructions && (

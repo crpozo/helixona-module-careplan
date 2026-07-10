@@ -18,6 +18,7 @@ import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { IconChip } from '@/components/IconChip'
+import { LearnTip } from '@/components/LearnTip'
 import { Pill } from '@/components/Pill'
 import { ProgressBar } from '@/components/ProgressBar'
 import { ProgressDots } from '@/components/ProgressDots'
@@ -114,6 +115,7 @@ function ItemRow({
         <p className="truncate text-base font-extrabold text-slate-800">{activity.name}</p>
         {detail && <div className="mt-0.5 text-xs font-semibold text-slate-400">{detail}</div>}
       </div>
+      <LearnTip activity={activity} />
       {children}
     </div>
   )

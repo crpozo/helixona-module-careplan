@@ -1,4 +1,4 @@
-import{A as e}from"./index.js";/**
+import{D as e}from"./index.js";/**
  * @license lucide-react v0.439.0 - ISC
  *
  * This source code is licensed under the ISC license.
