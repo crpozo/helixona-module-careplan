@@ -26,7 +26,8 @@ import {
   streakInfo,
 } from '@/lib/gamification'
 
-const STORAGE_KEY = 'helixona-careplan-v1'
+// v2: adds supplements/medications to the plan + in-app booking.
+const STORAGE_KEY = 'helixona-careplan-v2'
 
 // --- Actions ----------------------------------------------------------------
 
@@ -335,8 +336,12 @@ export function useDerived() {
     const level = levelInfo(points.lifetime)
     const streak = streakInfo(state)
     const badges = evaluateBadges(state)
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
     const upcoming = [...state.appointments]
-      .filter((a) => a.status === 'scheduled')
+      .filter(
+        (a) => a.status === 'scheduled' && new Date(a.date).getTime() >= todayStart.getTime(),
+      )
       .sort((a, b) => a.date.localeCompare(b.date))
 
     return {

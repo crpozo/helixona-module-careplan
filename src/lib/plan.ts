@@ -122,6 +122,13 @@ export const CATEGORY_META: Record<
   iv: { label: 'IV therapy', icon: 'Droplets' },
   office_visit: { label: 'Office visit', icon: 'Stethoscope' },
   home: { label: 'At-home', icon: 'Home' },
+  supplement: { label: 'Supplement', icon: 'Pill' },
+  medication: { label: 'Medication', icon: 'Tablets' },
+}
+
+/** Supplements & medicines get their own patient-facing group. */
+export function isSupplementLike(category: ActivityCategory): boolean {
+  return category === 'supplement' || category === 'medication'
 }
 
 export const LOCATION_LABEL: Record<'in_office' | 'at_home', string> = {

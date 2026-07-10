@@ -4,6 +4,7 @@ import { AppProvider, useApp } from '@/store/store'
 import { AppShell } from '@/components/AppShell'
 import { TodayPage } from '@/pages/TodayPage'
 import { CheckinPage } from '@/pages/CheckinPage'
+import { BookingPage } from '@/pages/BookingPage'
 import { LoginPage } from '@/pages/LoginPage'
 
 // Today loads eagerly (it's the landing route); the rest are split into their
@@ -47,8 +48,9 @@ function AuthenticatedApp() {
   return (
     <HashRouter>
       <Routes>
-        {/* Full-screen guided check-in — no app chrome, pure focus. */}
+        {/* Full-screen guided flows — no app chrome, pure focus. */}
         <Route path="checkin" element={<CheckinPage />} />
+        <Route path="book" element={<BookingPage />} />
           <Route element={<AppShell />}>
             <Route index element={<TodayPage />} />
             <Route

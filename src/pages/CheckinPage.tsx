@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Check, PartyPopper, Sparkles, X } from 'lucide-react'
 import { useApp } from '@/store/store'
-import { LOCATION_LABEL } from '@/lib/plan'
+import { LOCATION_LABEL, isSupplementLike } from '@/lib/plan'
 import { clamp, num, plural } from '@/lib/format'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/cn'
@@ -16,6 +16,9 @@ interface Step {
   name: string
   icon: string
   location: 'in_office' | 'at_home'
+  /** "Take" wording + dose chip for supplements/medications. */
+  isMed: boolean
+  dose?: string
   instructions?: string
   points: number
   ordered: number
@@ -39,6 +42,8 @@ export function CheckinPage() {
         name: a.name,
         icon: a.icon,
         location: a.location,
+        isMed: isSupplementLike(a.category),
+        dose: a.dose,
         instructions: a.instructions,
         points: a.points,
         ordered: a.timesPerWeek,
@@ -172,12 +177,17 @@ export function CheckinPage() {
         </div>
 
         <h1 className="mt-6 text-3xl font-extrabold text-slate-800">{step.name}</h1>
-        <p className="mt-2 text-lg font-semibold text-slate-500">Did you do this today?</p>
+        <p className="mt-2 text-lg font-semibold text-slate-500">
+          {step.isMed ? 'Did you take this today?' : 'Did you do this today?'}
+        </p>
 
         <div className="mt-5 flex flex-col items-center gap-3">
-          <Pill tone={step.location === 'at_home' ? 'brand' : 'neutral'}>
-            {LOCATION_LABEL[step.location]}
-          </Pill>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Pill tone={step.location === 'at_home' ? 'brand' : 'neutral'}>
+              {LOCATION_LABEL[step.location]}
+            </Pill>
+            {step.dose && <Pill tone="neutral">{step.dose}</Pill>}
+          </div>
           <div className="flex items-center gap-2">
             <ProgressDots total={step.ordered} done={dotsDone} />
             <span className="text-sm font-bold text-slate-400 tnum">this week</span>

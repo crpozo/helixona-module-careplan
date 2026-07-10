@@ -161,11 +161,11 @@ export function TodayPage() {
         />
       </div>
 
-      {/* Next visit (only if there is one) */}
-      {next && (
+      {/* Next visit — or a nudge to book one */}
+      {next ? (
         <div className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-4 sm:p-5">
           <IconChip icon={nextIconName} size="h-11 w-11" iconClassName="h-5 w-5" />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">
               Your next visit
             </p>
@@ -181,6 +181,26 @@ export function TodayPage() {
               · {next.provider}
             </p>
           </div>
+          <Link to="/book" className="shrink-0">
+            <Button variant="secondary" size="sm">
+              Book
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 rounded-3xl border-2 border-brand-200 bg-white p-4 sm:p-5">
+          <IconChip icon="CalendarDays" size="h-11 w-11" iconClassName="h-5 w-5" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-extrabold text-slate-800">No visits booked</p>
+            <p className="text-xs font-semibold text-slate-500">
+              Book your next treatment in under a minute.
+            </p>
+          </div>
+          <Link to="/book" className="shrink-0">
+            <Button variant="primary" size="sm">
+              Book a visit
+            </Button>
+          </Link>
         </div>
       )}
 

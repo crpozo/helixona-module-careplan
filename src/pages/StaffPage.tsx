@@ -31,7 +31,14 @@ const INPUT =
 
 const LABEL = 'mb-1 block text-xs font-extrabold uppercase tracking-wide text-slate-500'
 
-const CATEGORY_KEYS: ActivityCategory[] = ['treatment', 'iv', 'office_visit', 'home']
+const CATEGORY_KEYS: ActivityCategory[] = [
+  'treatment',
+  'iv',
+  'office_visit',
+  'home',
+  'supplement',
+  'medication',
+]
 const LOCATION_KEYS: ActivityLocation[] = ['in_office', 'at_home']
 
 // Default icon to attach to a new activity, keyed off its category.
@@ -40,6 +47,8 @@ const DEFAULT_ICON: Record<ActivityCategory, string> = {
   iv: 'Droplets',
   office_visit: 'Stethoscope',
   home: 'Home',
+  supplement: 'Pill',
+  medication: 'Tablets',
 }
 
 // Slugify a name into a stable-ish id with a short random suffix.

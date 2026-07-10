@@ -30,11 +30,17 @@ patient-facing screen shows as little as possible at once.
   that shows **one activity at a time** with two big answers — **"I did it!"**
   and **"Not yet"** — a progress bar on top, and a celebration screen at the
   end.
+- **Book a visit** (`/book`) — patients book their treatments in-app with the
+  same guided pattern: what → which day → what time → confirm. The booking
+  becomes a scheduled visit on the home screen.
 - **My Plan** — the goal in the patient's words, the care **journey**
   (Identification → Stabilization → Lead Actor 1/2/3 → Repair → Graduation) as
-  a vertical path with "You are here", and the weekly activity list.
+  a vertical path with "You are here", and the weekly activity list, including
+  a **Supplements & medicines** section with doses (e.g. "400 mg · before bed").
 - **This Week** — direct logging: one row per activity with progress dots and
-  a big **+** button; rows turn green when done.
+  a big **+** button, grouped by clinic / home / supplements & medicines.
+  Supplements count toward adherence and points like any other activity, and
+  the check-in asks "Did you take this today?" for them.
 - **Progress** — this week's ring, the streak, and a simple week-by-week bar
   list. No charts to decode.
 - **Rewards** — points balance & tier, a catalog of redeemable **gift cards

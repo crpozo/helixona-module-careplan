@@ -5,7 +5,7 @@ import { useApp } from '@/store/store'
 import { Card } from '@/components/Card'
 import { Pill } from '@/components/Pill'
 import { IconChip } from '@/components/IconChip'
-import { STAGES, STAGE_BY_KEY, CATEGORY_META } from '@/lib/plan'
+import { STAGES, STAGE_BY_KEY, CATEGORY_META, isSupplementLike } from '@/lib/plan'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/cn'
 
@@ -17,9 +17,10 @@ function ActivityRow({ activity }: { activity: Activity }) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-base font-extrabold text-slate-800">{activity.name}</p>
         <p className="mt-0.5 text-xs font-semibold text-slate-400">
-          {activity.durationMin != null
-            ? `≈${activity.durationMin} min`
-            : CATEGORY_META[activity.category].label}
+          {activity.dose ??
+            (activity.durationMin != null
+              ? `≈${activity.durationMin} min`
+              : CATEGORY_META[activity.category].label)}
         </p>
       </div>
       <Pill tone="neutral" className="shrink-0">
@@ -59,7 +60,10 @@ export function PlanPage() {
   const stages = [...STAGES].sort((a, b) => a.order - b.order)
 
   const clinicActivities = plan.activities.filter((a) => a.location === 'in_office')
-  const homeActivities = plan.activities.filter((a) => a.location === 'at_home')
+  const homeActivities = plan.activities.filter(
+    (a) => a.location === 'at_home' && !isSupplementLike(a.category),
+  )
+  const supplementActivities = plan.activities.filter((a) => isSupplementLike(a.category))
 
   return (
     <div className="mx-auto max-w-xl space-y-5">
@@ -149,6 +153,7 @@ export function PlanPage() {
         </h2>
         <ActivityGroup label="At the clinic" activities={clinicActivities} />
         <ActivityGroup label="At home" activities={homeActivities} />
+        <ActivityGroup label="Supplements & medicines" activities={supplementActivities} />
       </section>
 
       {/* 5) Staff shortcut (staff only) */}

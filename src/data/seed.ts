@@ -128,7 +128,53 @@ export const ACTIVITIES: Activity[] = [
     icon: 'Bath',
     instructions: 'Epsom salt bath to relax muscles and support gentle detox.',
   },
+  // --- Supplements & medications (daily protocol) ---
+  {
+    id: 'omega-3',
+    name: 'Omega-3',
+    category: 'supplement',
+    location: 'at_home',
+    timesPerWeek: 7,
+    points: 5,
+    icon: 'Pill',
+    dose: '2 caps · with breakfast',
+    instructions: 'Take with food so the oils absorb well.',
+  },
+  {
+    id: 'vitamin-d',
+    name: 'Vitamin D3 + K2',
+    category: 'supplement',
+    location: 'at_home',
+    timesPerWeek: 7,
+    points: 5,
+    icon: 'Sun',
+    dose: '5,000 IU · morning',
+    instructions: 'Best taken in the morning with a meal that has some fat.',
+  },
+  {
+    id: 'magnesium',
+    name: 'Magnesium Glycinate',
+    category: 'supplement',
+    location: 'at_home',
+    timesPerWeek: 7,
+    points: 5,
+    icon: 'Pill',
+    dose: '400 mg · before bed',
+    instructions: 'Take about 30 minutes before bed to support sleep.',
+  },
+  {
+    id: 'ldn',
+    name: 'LDN (Low-Dose Naltrexone)',
+    category: 'medication',
+    location: 'at_home',
+    timesPerWeek: 7,
+    points: 5,
+    icon: 'Tablets',
+    dose: '3 mg · at bedtime',
+    instructions: 'Your prescribed dose — take it at the same time every night.',
+  },
 ]
+
 
 const WEEKS: WeekLog[] = [
   {
@@ -146,6 +192,10 @@ const WEEKS: WeekLog[] = [
       rebounding: 3,
       'dry-brushing': 2,
       'salt-bath': 2,
+      'omega-3': 5,
+      'vitamin-d': 5,
+      magnesium: 4,
+      ldn: 6,
     },
   },
   {
@@ -163,6 +213,10 @@ const WEEKS: WeekLog[] = [
       rebounding: 4,
       'dry-brushing': 4,
       'salt-bath': 2,
+      'omega-3': 6,
+      'vitamin-d': 7,
+      magnesium: 6,
+      ldn: 7,
     },
   },
   {
@@ -180,6 +234,10 @@ const WEEKS: WeekLog[] = [
       rebounding: 5,
       'dry-brushing': 4,
       'salt-bath': 3,
+      'omega-3': 7,
+      'vitamin-d': 7,
+      magnesium: 6,
+      ldn: 7,
     },
   },
   {
@@ -198,6 +256,10 @@ const WEEKS: WeekLog[] = [
       rebounding: 1,
       'dry-brushing': 1,
       'salt-bath': 0,
+      'omega-3': 2,
+      'vitamin-d': 2,
+      magnesium: 1,
+      ldn: 2,
     },
   },
 ]

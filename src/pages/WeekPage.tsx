@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Check, Minus, PartyPopper, Plus } from 'lucide-react'
 import type { ActivityAdherence } from '@/types'
 import { useApp, useDerived } from '@/store/store'
+import { isSupplementLike } from '@/lib/plan'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
@@ -89,7 +90,10 @@ export function WeekPage() {
   const allDone = totalOrdered > 0 && rows.every((r) => r.actual >= r.ordered)
 
   const clinicRows = rows.filter((r) => r.activity.location === 'in_office')
-  const homeRows = rows.filter((r) => r.activity.location === 'at_home')
+  const homeRows = rows.filter(
+    (r) => r.activity.location === 'at_home' && !isSupplementLike(r.activity.category),
+  )
+  const supplementRows = rows.filter((r) => isSupplementLike(r.activity.category))
 
   return (
     <div className="mx-auto max-w-xl space-y-5">
@@ -158,6 +162,20 @@ export function WeekPage() {
             <section className="space-y-3">
               <GroupLabel>At home</GroupLabel>
               {homeRows.map((row) => (
+                <ActivityRow
+                  key={row.activity.id}
+                  row={row}
+                  onLog={(delta) => actions.logCompletion(row.activity.id, delta)}
+                />
+              ))}
+            </section>
+          )}
+
+          {/* Supplements & medicines */}
+          {supplementRows.length > 0 && (
+            <section className="space-y-3">
+              <GroupLabel>Supplements &amp; medicines</GroupLabel>
+              {supplementRows.map((row) => (
                 <ActivityRow
                   key={row.activity.id}
                   row={row}

@@ -48,6 +48,8 @@ export type ActivityCategory =
   | 'iv' // IV therapy
   | 'office_visit' // provider visits / check-ins
   | 'home' // rebounding, dry brushing, salt bath …
+  | 'supplement' // omega-3, vitamin D, magnesium …
+  | 'medication' // prescribed medicines (e.g. LDN)
 
 /** A single recurring item in the plan of care. */
 export interface Activity {
@@ -61,6 +63,8 @@ export interface Activity {
   points: number
   /** Patient-facing how/why. */
   instructions?: string
+  /** Dose + timing for supplements/medications, e.g. "400 mg · before bed". */
+  dose?: string
   /** Approx duration in minutes (in-office items). */
   durationMin?: number
   /** lucide-react icon name. */
