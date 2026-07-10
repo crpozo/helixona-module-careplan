@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Check, ChevronRight } from 'lucide-react'
 import { useApp, useDerived } from '@/store/store'
+import { isDoneOnDay, isScheduledOn, weekdayIndex } from '@/lib/schedule'
 import { formatDate, formatWeekday, num, plural } from '@/lib/format'
 import { getIcon } from '@/lib/icons'
 import { Card } from '@/components/Card'
@@ -57,9 +58,16 @@ export function TodayPage() {
   const now = useMemo(() => new Date(), [])
   const hello = greeting(now)
 
+  // Today's list only — never the whole week's treatment at once.
+  const todayIdx = weekdayIndex(now)
   const adherence = d.currentAdherence
-  const remaining = adherence.byActivity.reduce((n, a) => n + Math.max(0, a.ordered - a.actual), 0)
+  const todayItems = adherence.byActivity.filter((r) => isScheduledOn(r.activity, todayIdx))
+  const doneCount = todayItems.filter((r) =>
+    isDoneOnDay(d.currentWeekLog, r.activity.id, todayIdx),
+  ).length
+  const remaining = todayItems.length - doneCount
   const allDone = remaining === 0
+  const todayPct = todayItems.length > 0 ? (doneCount / todayItems.length) * 100 : 100
 
   const next = d.upcoming[0]
   const nextIconName = next
@@ -102,7 +110,7 @@ export function TodayPage() {
         <div className="flex items-center justify-center gap-4 text-left sm:gap-6">
           {/* Big ring only when the window is both wide AND tall enough. */}
           <ProgressRing
-            value={adherence.pct}
+            value={todayPct}
             size={92}
             stroke={10}
             className="shrink-0 [@media(min-width:640px)_and_(min-height:780px)]:hidden"
@@ -110,7 +118,7 @@ export function TodayPage() {
             {ringInner(false)}
           </ProgressRing>
           <ProgressRing
-            value={adherence.pct}
+            value={todayPct}
             size={148}
             stroke={14}
             className="hidden shrink-0 [@media(min-width:640px)_and_(min-height:780px)]:block"
@@ -120,11 +128,11 @@ export function TodayPage() {
           <div className="min-w-0">
             <p className="text-lg font-extrabold leading-snug text-slate-800 sm:text-2xl">
               {allDone
-                ? 'All done for this week! 🎉'
-                : `${num(remaining)} ${plural(remaining, 'thing')} left this week`}
+                ? 'All done for today! 🎉'
+                : `${num(remaining)} ${plural(remaining, 'thing')} to do today`}
             </p>
             <p className="mt-0.5 text-sm font-bold text-slate-500 tnum sm:text-base">
-              {num(adherence.actual)} of {num(adherence.ordered)} done
+              {num(doneCount)} of {num(todayItems.length)} done today
             </p>
           </div>
         </div>

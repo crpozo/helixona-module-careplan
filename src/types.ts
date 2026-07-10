@@ -78,6 +78,11 @@ export interface WeekLog {
   startDate: string
   /** activityId -> actual completions logged this week. */
   completions: Record<string, number>
+  /**
+   * activityId -> bitmask of weekdays (Mon=bit 0 … Sun=bit 6) the patient
+   * marked "Yes" on. Powers the per-day views; counts stay in completions.
+   */
+  dailyDone?: Record<string, number>
   /** Optional free-text note from staff or patient. */
   note?: string
 }

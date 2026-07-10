@@ -26,13 +26,14 @@ import {
   streakInfo,
 } from '@/lib/gamification'
 
-// v2: adds supplements/medications to the plan + in-app booking.
-const STORAGE_KEY = 'helixona-careplan-v2'
+// v3: per-day logging (dailyDone bitmasks) + supplements + in-app booking.
+const STORAGE_KEY = 'helixona-careplan-v3'
 
 // --- Actions ----------------------------------------------------------------
 
 type Action =
   | { type: 'LOG_COMPLETION'; activityId: string; delta: number }
+  | { type: 'LOG_DAILY'; activityId: string; weekday: number; done: boolean }
   | { type: 'SET_COMPLETION'; weekNumber: number; activityId: string; value: number }
   | { type: 'ADD_REDEMPTION'; redemption: Redemption }
   | { type: 'MARK_REDEMPTION_USED'; id: string }
@@ -93,6 +94,42 @@ function reducer(state: AppState, action: Action): AppState {
           const next = clamp((c[action.activityId] ?? 0) + action.delta, 0, ordered)
           return { ...c, [action.activityId]: next }
         }),
+      }
+    }
+    // Mark a weekday "Yes"/undone: flips the day bit AND moves the weekly count.
+    case 'LOG_DAILY': {
+      const ordered = orderedFor(state, action.activityId)
+      const bit = 1 << action.weekday
+      return {
+        ...state,
+        weeks: state.weeks.some((w) => w.weekNumber === state.currentWeek)
+          ? state.weeks.map((w) => {
+              if (w.weekNumber !== state.currentWeek) return w
+              const mask = w.dailyDone?.[action.activityId] ?? 0
+              if (Boolean(mask & bit) === action.done) return w
+              const count = clamp(
+                (w.completions[action.activityId] ?? 0) + (action.done ? 1 : -1),
+                0,
+                ordered,
+              )
+              return {
+                ...w,
+                completions: { ...w.completions, [action.activityId]: count },
+                dailyDone: {
+                  ...w.dailyDone,
+                  [action.activityId]: action.done ? mask | bit : mask & ~bit,
+                },
+              }
+            })
+          : [
+              ...state.weeks,
+              {
+                weekNumber: state.currentWeek,
+                startDate: nextWeekStart(state, state.currentWeek),
+                completions: { [action.activityId]: action.done ? 1 : 0 },
+                dailyDone: { [action.activityId]: action.done ? bit : 0 },
+              },
+            ].sort((a, b) => a.weekNumber - b.weekNumber),
       }
     }
     case 'SET_COMPLETION': {
@@ -224,6 +261,9 @@ function makeActions(state: AppState, dispatch: React.Dispatch<Action>) {
   return {
     logCompletion: (activityId: string, delta = 1) =>
       dispatch({ type: 'LOG_COMPLETION', activityId, delta }),
+    /** Patient marked (or un-marked) an activity as done for a weekday. */
+    logDaily: (activityId: string, weekday: number, done: boolean) =>
+      dispatch({ type: 'LOG_DAILY', activityId, weekday, done }),
     setCompletion: (weekNumber: number, activityId: string, value: number) =>
       dispatch({ type: 'SET_COMPLETION', weekNumber, activityId, value }),
     /** Redeem a reward. Returns the new Redemption, or null if unaffordable. */

@@ -37,8 +37,13 @@ patient-facing screen shows as little as possible at once.
   (Identification → Stabilization → Lead Actor 1/2/3 → Repair → Graduation) as
   a vertical path with "You are here", and the weekly activity list, including
   a **Supplements & medicines** section with doses (e.g. "400 mg · before bed").
-- **This Week** — direct logging: one row per activity with progress dots and
-  a big **+** button, grouped by clinic / home / supplements & medicines.
+- **Schedule** — the plan filtered the way patients think: **by day**
+  (default — just today's items with a clear **Yes ✓ / Undo** control, never
+  the whole week at once), **by week** (progress dots), **by month**
+  (calendar overview) and **by treatment** (one activity up close with its
+  days and week-by-week history). Weekly orders map to fixed weekdays
+  (`src/lib/schedule.ts`, clinic closed Sundays) and per-day "Yes" marks are
+  stored as weekday bitmasks that also drive the weekly counts.
   Supplements count toward adherence and points like any other activity, and
   the check-in asks "Did you take this today?" for them.
 - **Progress** — this week's ring, the streak, and a simple week-by-week bar

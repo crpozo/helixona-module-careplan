@@ -12,9 +12,9 @@ export const PATIENT_NAV: NavItem[] = [
   { to: '/plan', label: 'My Plan', icon: 'HeartPulse', subtitle: 'Your full plan of care' },
   {
     to: '/week',
-    label: 'This Week',
+    label: 'Schedule',
     icon: 'CalendarDays',
-    subtitle: 'Check off what you do',
+    subtitle: 'By day, week, month or treatment',
   },
   {
     to: '/progress',

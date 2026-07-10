@@ -3,13 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Check, PartyPopper, Sparkles, X } from 'lucide-react'
 import { useApp } from '@/store/store'
 import { LOCATION_LABEL, isSupplementLike } from '@/lib/plan'
-import { clamp, num, plural } from '@/lib/format'
+import { isDoneOnDay, isScheduledOn, weekdayIndex } from '@/lib/schedule'
+import { num, plural } from '@/lib/format'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/Button'
 import { Pill } from '@/components/Pill'
 import { ProgressBar } from '@/components/ProgressBar'
-import { ProgressDots } from '@/components/ProgressDots'
 
 interface Step {
   id: string
@@ -21,9 +21,6 @@ interface Step {
   dose?: string
   instructions?: string
   points: number
-  ordered: number
-  /** Completions already logged when the check-in started. */
-  doneAtStart: number
 }
 
 /**
@@ -34,9 +31,13 @@ export function CheckinPage() {
   const { state, actions } = useApp()
   const navigate = useNavigate()
 
+  // Only TODAY's scheduled, not-yet-done items — one small list, never the
+  // whole week (see src/lib/schedule.ts for how weekly orders map to days).
+  const todayIdx = weekdayIndex(new Date())
   const [steps] = useState<Step[]>(() => {
     const week = state.weeks.find((w) => w.weekNumber === state.currentWeek)
     return state.plan.activities
+      .filter((a) => isScheduledOn(a, todayIdx) && !isDoneOnDay(week, a.id, todayIdx))
       .map((a) => ({
         id: a.id,
         name: a.name,
@@ -46,10 +47,7 @@ export function CheckinPage() {
         dose: a.dose,
         instructions: a.instructions,
         points: a.points,
-        ordered: a.timesPerWeek,
-        doneAtStart: clamp(Math.round(week?.completions[a.id] ?? 0), 0, a.timesPerWeek),
       }))
-      .filter((s) => s.doneAtStart < s.ordered)
   })
 
   const [idx, setIdx] = useState(0)
@@ -71,7 +69,7 @@ export function CheckinPage() {
 
   function onDidIt() {
     if (!step || justDid !== null) return
-    actions.logCompletion(step.id, 1)
+    actions.logDaily(step.id, todayIdx, true)
     setEarned((e) => e + step.points)
     setDidCount((c) => c + 1)
     setJustDid(step.points)
@@ -111,7 +109,7 @@ export function CheckinPage() {
           )}
           <p className="mt-3 max-w-xs text-base font-semibold text-slate-500">
             {nothingToDo
-              ? "You've finished everything in your plan for this week. Amazing!"
+              ? "You've finished everything on your plan for today. Amazing!"
               : restedInstead
                 ? 'Rest matters too. Your plan will be right here when you are ready.'
                 : `You checked off ${num(didCount)} ${plural(didCount, 'activity', 'activities')}. Keep it up!`}
@@ -133,7 +131,6 @@ export function CheckinPage() {
 
   // ---- One activity per screen ---------------------------------------------
   const StepIcon = getIcon(step.icon)
-  const dotsDone = step.doneAtStart + (justDid !== null ? 1 : 0)
 
   return (
     <div className="h-viewport flex flex-col bg-white">
@@ -181,17 +178,11 @@ export function CheckinPage() {
           {step.isMed ? 'Did you take this today?' : 'Did you do this today?'}
         </p>
 
-        <div className="mt-5 flex flex-col items-center gap-3">
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <Pill tone={step.location === 'at_home' ? 'brand' : 'neutral'}>
-              {LOCATION_LABEL[step.location]}
-            </Pill>
-            {step.dose && <Pill tone="neutral">{step.dose}</Pill>}
-          </div>
-          <div className="flex items-center gap-2">
-            <ProgressDots total={step.ordered} done={dotsDone} />
-            <span className="text-sm font-bold text-slate-400 tnum">this week</span>
-          </div>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <Pill tone={step.location === 'at_home' ? 'brand' : 'neutral'}>
+            {LOCATION_LABEL[step.location]}
+          </Pill>
+          {step.dose && <Pill tone="neutral">{step.dose}</Pill>}
         </div>
 
         {step.instructions && (
