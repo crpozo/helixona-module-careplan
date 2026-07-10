@@ -131,6 +131,27 @@ export function isSupplementLike(category: ActivityCategory): boolean {
   return category === 'supplement' || category === 'medication'
 }
 
+/** Default icon to attach to a new activity, keyed off its category. */
+export const DEFAULT_ACTIVITY_ICON: Record<ActivityCategory, string> = {
+  treatment: 'Zap',
+  iv: 'Droplets',
+  office_visit: 'Stethoscope',
+  home: 'Home',
+  supplement: 'Pill',
+  medication: 'Tablets',
+}
+
+/** Slugify a name into a stable-ish id with a short random suffix. */
+export function slugId(name: string, fallback = 'activity'): string {
+  const base =
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || fallback
+  return `${base}-${Math.random().toString(36).slice(2, 6)}`
+}
+
 export const LOCATION_LABEL: Record<'in_office' | 'at_home', string> = {
   in_office: 'In office',
   at_home: 'At home',

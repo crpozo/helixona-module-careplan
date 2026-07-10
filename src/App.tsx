@@ -25,6 +25,9 @@ const RewardsPage = lazy(() =>
 const StaffPage = lazy(() =>
   import('@/pages/StaffPage').then((m) => ({ default: m.StaffPage })),
 )
+const PatientsPage = lazy(() =>
+  import('@/pages/PatientsPage').then((m) => ({ default: m.PatientsPage })),
+)
 
 function RouteFallback() {
   return (
@@ -91,6 +94,16 @@ function AuthenticatedApp() {
                 <RequireStaff>
                   <Suspense fallback={<RouteFallback />}>
                     <StaffPage />
+                  </Suspense>
+                </RequireStaff>
+              }
+            />
+            <Route
+              path="patients"
+              element={
+                <RequireStaff>
+                  <Suspense fallback={<RouteFallback />}>
+                    <PatientsPage />
                   </Suspense>
                 </RequireStaff>
               }

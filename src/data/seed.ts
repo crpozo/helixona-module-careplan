@@ -1,9 +1,10 @@
 import type {
   Activity,
   Appointment,
-  AppState,
   BadgeDef,
+  PatientRecord,
   Reward,
+  RootState,
   WeekLog,
 } from '@/types'
 
@@ -514,10 +515,9 @@ export const BADGES: BadgeDef[] = [
   },
 ]
 
-export function createSeedState(): AppState {
+/** Maya — the fully fleshed-out demo patient (4 weeks of history). */
+function mayaRecord(): PatientRecord {
   return {
-    authenticated: false,
-    role: 'patient',
     patient: {
       id: 'pt-001',
       firstName: 'Maya',
@@ -540,7 +540,182 @@ export function createSeedState(): AppState {
     currentWeek: 4,
     redemptions: SEED_REDEMPTIONS,
     appointments: APPOINTMENTS,
-    rewards: REWARDS,
     adherenceTarget: 80,
+  }
+}
+
+/**
+ * Two lighter records so the staff patient dashboard has a roster to manage.
+ * Also appended when upgrading an older single-patient save.
+ */
+export function extraSeedRecords(): PatientRecord[] {
+  return [
+    {
+      patient: {
+        id: 'pt-002',
+        firstName: 'James',
+        lastName: 'Okafor',
+        program: 'wellness',
+        programLabel: 'Wellness & Longevity',
+        provider: 'Dr. Chen',
+        ecwId: 'ECW-51770',
+        email: 'james.okafor@example.com',
+      },
+      plan: {
+        stage: 'lead_actor_1',
+        pacing: 'gentle',
+        startDate: '2026-06-22',
+        goal: 'Stay sharp and strong into my 60s.',
+        focus: 'Building an aerobic base and recovery habits.',
+        activities: [
+          {
+            id: 'red-light',
+            name: 'Red Light',
+            category: 'treatment',
+            location: 'in_office',
+            timesPerWeek: 2,
+            points: 15,
+            durationMin: 20,
+            icon: 'Sun',
+            instructions: 'Full-body red-light therapy to support recovery.',
+          },
+          {
+            id: 'iv-therapy',
+            name: 'IV Therapy',
+            category: 'iv',
+            location: 'in_office',
+            timesPerWeek: 1,
+            points: 40,
+            durationMin: 45,
+            icon: 'Droplets',
+            instructions: 'Nutrient IV drip — hydrate beforehand.',
+          },
+          {
+            id: 'zone2-cardio',
+            name: 'Zone 2 Cardio',
+            category: 'home',
+            location: 'at_home',
+            timesPerWeek: 3,
+            points: 15,
+            durationMin: 45,
+            icon: 'Bike',
+            instructions: '45 easy minutes — you should be able to hold a conversation.',
+          },
+          {
+            id: 'creatine',
+            name: 'Creatine',
+            category: 'supplement',
+            location: 'at_home',
+            timesPerWeek: 7,
+            points: 5,
+            icon: 'Pill',
+            dose: '5 g · morning',
+            instructions: 'Mix into water or a shake, any time of day works.',
+          },
+        ],
+      },
+      weeks: [
+        {
+          weekNumber: 1,
+          startDate: '2026-06-22',
+          completions: { 'red-light': 2, 'iv-therapy': 1, 'zone2-cardio': 2, creatine: 6 },
+        },
+        {
+          weekNumber: 2,
+          startDate: '2026-06-29',
+          completions: { 'red-light': 1, 'iv-therapy': 0, 'zone2-cardio': 1, creatine: 2 },
+        },
+      ],
+      currentWeek: 2,
+      redemptions: [],
+      appointments: [],
+      adherenceTarget: 80,
+    },
+    {
+      patient: {
+        id: 'pt-003',
+        firstName: 'Sofia',
+        lastName: 'Reyes',
+        program: 'neuro',
+        programLabel: 'Functional Neuro',
+        provider: 'Dr. Drannikov',
+        ecwId: 'ECW-53102',
+        email: 'sofia.reyes@example.com',
+      },
+      plan: {
+        stage: 'identification',
+        pacing: 'standard',
+        startDate: '2026-06-29',
+        goal: 'Clear the brain fog and feel like myself again.',
+        focus: 'Mapping drivers — labs, sleep and nervous-system baseline.',
+        activities: [
+          {
+            id: 'neurofeedback',
+            name: 'Neurofeedback',
+            category: 'treatment',
+            location: 'in_office',
+            timesPerWeek: 2,
+            points: 25,
+            durationMin: 40,
+            icon: 'Activity',
+            instructions: 'Brain-training session — arrive rested if you can.',
+          },
+          {
+            id: 'office-visit',
+            name: 'Provider Visit',
+            category: 'office_visit',
+            location: 'in_office',
+            timesPerWeek: 1,
+            points: 30,
+            durationMin: 20,
+            icon: 'Stethoscope',
+            instructions: 'Review intake results with your provider.',
+          },
+          {
+            id: 'sunlight-walk',
+            name: 'Morning Sunlight Walk',
+            category: 'home',
+            location: 'at_home',
+            timesPerWeek: 5,
+            points: 10,
+            durationMin: 15,
+            icon: 'Sun',
+            instructions: '10–15 minutes of outdoor light within an hour of waking.',
+          },
+          {
+            id: 'omega-3',
+            name: 'Omega-3',
+            category: 'supplement',
+            location: 'at_home',
+            timesPerWeek: 7,
+            points: 5,
+            icon: 'Pill',
+            dose: '2 caps · with breakfast',
+            instructions: 'Take with food so the oils absorb well.',
+          },
+        ],
+      },
+      weeks: [
+        {
+          weekNumber: 1,
+          startDate: '2026-06-29',
+          completions: { neurofeedback: 1, 'office-visit': 1, 'sunlight-walk': 2, 'omega-3': 2 },
+        },
+      ],
+      currentWeek: 1,
+      redemptions: [],
+      appointments: [],
+      adherenceTarget: 80,
+    },
+  ]
+}
+
+export function createSeedState(): RootState {
+  return {
+    authenticated: false,
+    role: 'patient',
+    activePatientId: 'pt-001',
+    patients: [mayaRecord(), ...extraSeedRecords()],
+    rewards: REWARDS,
   }
 }

@@ -189,12 +189,8 @@ export interface CarePlan {
   activities: Activity[]
 }
 
-/** The full persisted application state (single patient context). */
-export interface AppState {
-  /** Whether someone is signed in (login screen shows until true). */
-  authenticated: boolean
-  /** Current viewer. Patients can't edit the plan; staff can. */
-  role: UserRole
+/** Everything the clinic tracks for one patient — profile, plan and history. */
+export interface PatientRecord {
   patient: Patient
   plan: CarePlan
   weeks: WeekLog[]
@@ -202,10 +198,27 @@ export interface AppState {
   currentWeek: number
   redemptions: Redemption[]
   appointments: Appointment[]
-  rewards: Reward[]
   /** Adherence % threshold considered "on track" (e.g. 80). */
   adherenceTarget: number
 }
+
+/** The persisted root — the clinic's whole panel of patients. */
+export interface RootState {
+  /** Whether someone is signed in (login screen shows until true). */
+  authenticated: boolean
+  /** Current viewer. Patients can't edit the plan; staff can. */
+  role: UserRole
+  /** The patient the patient-facing app (Today, Plan, …) is showing. */
+  activePatientId: string
+  patients: PatientRecord[]
+  rewards: Reward[]
+}
+
+/**
+ * What pages consume: the root plus the active patient's record flattened in,
+ * so the single-patient views keep reading `state.plan`, `state.weeks`, etc.
+ */
+export interface AppState extends RootState, PatientRecord {}
 
 // --- Derived view-models -----------------------------------------------------
 

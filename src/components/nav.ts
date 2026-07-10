@@ -27,6 +27,12 @@ export const PATIENT_NAV: NavItem[] = [
 
 export const STAFF_NAV: NavItem[] = [
   {
+    to: '/patients',
+    label: 'Patients',
+    icon: 'Users',
+    subtitle: 'Add & manage patients',
+  },
+  {
     to: '/staff',
     label: 'Staff Entry',
     icon: 'Stethoscope',

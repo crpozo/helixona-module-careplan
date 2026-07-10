@@ -11,8 +11,10 @@ import {
   STAGES,
   PACINGS,
   CATEGORY_META,
+  DEFAULT_ACTIVITY_ICON,
   LOCATION_LABEL,
   PROGRAM_LABEL,
+  slugId,
 } from '@/lib/plan'
 import { computeWeekAdherence, statusFromPct } from '@/lib/gamification'
 import { pct, plural } from '@/lib/format'
@@ -40,27 +42,6 @@ const CATEGORY_KEYS: ActivityCategory[] = [
   'medication',
 ]
 const LOCATION_KEYS: ActivityLocation[] = ['in_office', 'at_home']
-
-// Default icon to attach to a new activity, keyed off its category.
-const DEFAULT_ICON: Record<ActivityCategory, string> = {
-  treatment: 'Zap',
-  iv: 'Droplets',
-  office_visit: 'Stethoscope',
-  home: 'Home',
-  supplement: 'Pill',
-  medication: 'Tablets',
-}
-
-// Slugify a name into a stable-ish id with a short random suffix.
-function slugId(name: string): string {
-  const base =
-    name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'activity'
-  return `${base}-${Math.random().toString(36).slice(2, 6)}`
-}
 
 /** One option in a segmented choice group (stage, pacing). */
 function SegButton({
@@ -142,6 +123,25 @@ export function StaffPage() {
                 <span className="font-extrabold text-slate-700">{patient.provider}</span>
               </span>
             </div>
+            {/* Everything below edits whichever patient is chosen here. */}
+            <div className="mt-3 max-w-xs">
+              <label className={LABEL} htmlFor="staff-patient">
+                Patient
+              </label>
+              <select
+                id="staff-patient"
+                className={INPUT}
+                value={state.activePatientId}
+                onChange={(e) => actions.setActivePatient(e.target.value)}
+              >
+                {state.patients.map((r) => (
+                  <option key={r.patient.id} value={r.patient.id}>
+                    {r.patient.firstName} {r.patient.lastName}
+                    {r.patient.ecwId ? ` — ${r.patient.ecwId}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </Card>
@@ -169,7 +169,8 @@ export function StaffPage() {
             <div className="min-w-0">
               <p className="text-sm font-extrabold text-slate-800">Reset demo data</p>
               <p className="mt-0.5 text-xs font-semibold text-slate-500">
-                Discards every plan edit, weekly log and redemption for {patient.firstName}.
+                Restores the seeded patient roster — every plan edit, weekly log and
+                redemption is discarded.
               </p>
             </div>
           </div>
@@ -445,7 +446,7 @@ function AddActivityForm() {
       location: draft.location,
       timesPerWeek: Math.max(0, Math.round(draft.timesPerWeek) || 0),
       points: Math.max(0, Math.round(draft.points) || 0),
-      icon: DEFAULT_ICON[draft.category],
+      icon: DEFAULT_ACTIVITY_ICON[draft.category],
     }
     actions.upsertActivity(activity)
     setDraft(EMPTY_DRAFT)
