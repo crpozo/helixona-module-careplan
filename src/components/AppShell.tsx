@@ -106,7 +106,8 @@ export function AppShell() {
   const { level } = useDerived()
   const isStaff = state.role === 'staff'
   const TierIcon = getIcon(level.icon)
-  const tabs = isStaff ? [...PATIENT_NAV, ...STAFF_NAV] : PATIENT_NAV
+  // Staff get their console only; patients get their app. No mixing.
+  const navItems = isStaff ? STAFF_NAV : PATIENT_NAV
 
   return (
     <div className="min-h-screen bg-white">
@@ -115,37 +116,33 @@ export function AppShell() {
         <NavLink to="/" aria-label="Helixona home" className="px-2">
           <Logo />
         </NavLink>
-        <nav className="mt-6 flex flex-col gap-1.5">
-          {PATIENT_NAV.map((item) => (
+        {isStaff && (
+          <p className="mt-6 px-4 pb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+            Clinic console
+          </p>
+        )}
+        <nav className={cn('flex flex-col gap-1.5', isStaff ? 'mt-0' : 'mt-6')}>
+          {navItems.map((item) => (
             <SideLink key={item.to} item={item} />
           ))}
         </nav>
-        {isStaff && (
-          <>
-            <p className="mt-5 px-4 pb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-              Clinic
-            </p>
-            <nav className="flex flex-col gap-1.5">
-              {STAFF_NAV.map((item) => (
-                <SideLink key={item.to} item={item} />
-              ))}
-            </nav>
-          </>
-        )}
         <div className="mt-auto space-y-3 px-1">
-          <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-3">
-            <div className="flex items-center gap-2 text-brand-800">
-              <TierIcon className="h-4 w-4" />
-              <span className="text-xs font-extrabold">{level.tier} tier</span>
+          {/* Tier progress is the patient's — staff don't have one. */}
+          {!isStaff && (
+            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-3">
+              <div className="flex items-center gap-2 text-brand-800">
+                <TierIcon className="h-4 w-4" />
+                <span className="text-xs font-extrabold">{level.tier} tier</span>
+              </div>
+              <p className="mt-1 text-[11px] font-bold text-slate-500">
+                {level.nextTier ? `${num(level.toNext)} pts to ${level.nextTier}` : 'Top tier reached'}
+              </p>
             </div>
-            <p className="mt-1 text-[11px] font-bold text-slate-500">
-              {level.nextTier ? `${num(level.toNext)} pts to ${level.nextTier}` : 'Top tier reached'}
-            </p>
-          </div>
+          )}
           <div className="flex items-center gap-2 rounded-2xl border-2 border-slate-200 bg-white p-2">
             <Avatar
-              firstName={state.patient.firstName}
-              lastName={state.patient.lastName}
+              firstName={isStaff ? 'Clinic' : state.patient.firstName}
+              lastName={isStaff ? 'Staff' : state.patient.lastName}
               size="h-9 w-9"
             />
             <div className="min-w-0 flex-1">
@@ -169,11 +166,15 @@ export function AppShell() {
               <Logo />
             </NavLink>
             <div className="ml-auto flex items-center gap-2">
-              <StreakChip />
-              <PointsChip />
+              {!isStaff && (
+                <>
+                  <StreakChip />
+                  <PointsChip />
+                </>
+              )}
               <Avatar
-                firstName={state.patient.firstName}
-                lastName={state.patient.lastName}
+                firstName={isStaff ? 'Clinic' : state.patient.firstName}
+                lastName={isStaff ? 'Staff' : state.patient.lastName}
                 size="h-9 w-9"
                 className="hidden sm:inline-flex"
               />
@@ -193,7 +194,7 @@ export function AppShell() {
         className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t-2 border-slate-200 bg-white lg:hidden"
       >
         <div className="mx-auto flex w-full max-w-md items-stretch gap-1 px-2 py-1.5">
-          {tabs.map((item) => (
+          {navItems.map((item) => (
             <TabLink key={item.to} item={item} />
           ))}
         </div>

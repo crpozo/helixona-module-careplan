@@ -6,6 +6,7 @@ import { LOCATION_LABEL, isSupplementLike } from '@/lib/plan'
 import { isDoneOnDay, isScheduledOn, weekdayIndex } from '@/lib/schedule'
 import { num, plural } from '@/lib/format'
 import { getIcon } from '@/lib/icons'
+import { sfx } from '@/lib/sound'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/Button'
 import { Pill } from '@/components/Pill'
@@ -62,6 +63,15 @@ export function CheckinPage() {
   const finished = idx >= steps.length
   const step = steps[idx]
 
+  // One soft chord when the run ends with at least one thing done.
+  const celebrated = useRef(false)
+  useEffect(() => {
+    if (finished && didCount > 0 && !celebrated.current) {
+      celebrated.current = true
+      sfx.complete()
+    }
+  }, [finished, didCount])
+
   function advance() {
     setJustDid(null)
     setIdx((i) => i + 1)
@@ -69,6 +79,7 @@ export function CheckinPage() {
 
   function onDidIt() {
     if (!step || justDid !== null) return
+    sfx.done()
     actions.logDaily(step.id, todayIdx, true)
     setEarned((e) => e + step.points)
     setDidCount((c) => c + 1)
@@ -207,7 +218,10 @@ export function CheckinPage() {
           variant="secondary"
           size="xl"
           className="w-full"
-          onClick={advance}
+          onClick={() => {
+            sfx.tick()
+            advance()
+          }}
           disabled={justDid !== null}
         >
           Not yet

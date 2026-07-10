@@ -36,7 +36,7 @@ export function LoginPage() {
   function onSubmit(e: FormEvent) {
     e.preventDefault()
     // Land staff in their console; patients start their day at home.
-    window.location.hash = tab === 'staff' ? '#/staff' : '#/'
+    window.location.hash = tab === 'staff' ? '#/patients' : '#/'
     actions.login(tab)
   }
 

@@ -12,6 +12,7 @@ import {
   weekdayIndex,
 } from '@/lib/schedule'
 import { adherenceColor } from '@/lib/colors'
+import { sfx } from '@/lib/sound'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
@@ -190,8 +191,14 @@ export function WeekPage() {
           name={a.name}
           done={covered}
           canUndo={covered}
-          onYes={() => actions.logDaily(a.id, selectedDay, true)}
-          onUndo={() => actions.logDaily(a.id, selectedDay, false)}
+          onYes={() => {
+            sfx.done()
+            actions.logDaily(a.id, selectedDay, true)
+          }}
+          onUndo={() => {
+            sfx.undo()
+            actions.logDaily(a.id, selectedDay, false)
+          }}
         />
       )
     }
@@ -212,6 +219,7 @@ export function WeekPage() {
   // Week/Treatment logging: prefer marking TODAY done; fall back to the
   // plain weekly counter for catch-up logging on unscheduled days.
   function logOne(a: Activity) {
+    sfx.done()
     if (isScheduledOn(a, todayIdx) && !isDoneOnDay(weekLog, a.id, todayIdx)) {
       actions.logDaily(a.id, todayIdx, true)
     } else {
@@ -219,6 +227,7 @@ export function WeekPage() {
     }
   }
   function undoOne(a: Activity) {
+    sfx.undo()
     if (isDoneOnDay(weekLog, a.id, todayIdx)) {
       actions.logDaily(a.id, todayIdx, false)
     } else {

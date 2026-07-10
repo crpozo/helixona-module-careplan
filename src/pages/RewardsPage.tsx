@@ -2,6 +2,7 @@ import { Coins } from 'lucide-react'
 import { useApp, useDerived } from '@/store/store'
 import { formatShortDate, num } from '@/lib/format'
 import { getIcon } from '@/lib/icons'
+import { sfx } from '@/lib/sound'
 import { Card } from '@/components/Card'
 import { IconChip } from '@/components/IconChip'
 import { Pill } from '@/components/Pill'
@@ -76,7 +77,9 @@ export function RewardsPage() {
                   <Button
                     variant="primary"
                     className="mt-3 w-full"
-                    onClick={() => actions.redeem(r.id)}
+                    onClick={() => {
+                      if (actions.redeem(r.id)) sfx.reward()
+                    }}
                   >
                     Redeem
                   </Button>
