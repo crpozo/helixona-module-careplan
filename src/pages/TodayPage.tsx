@@ -341,14 +341,18 @@ export function TodayPage() {
         {clinicToday.length > 0 ? (
           <div className="space-y-2.5">
             {clinicToday.map((appt) => {
-              const iconName =
-                (appt.activityId &&
-                  state.plan.activities.find((a) => a.id === appt.activityId)?.icon) ||
-                'CalendarCheck'
+              const linked = appt.activityId
+                ? state.plan.activities.find((a) => a.id === appt.activityId)
+                : undefined
+              const iconName = linked?.icon || 'CalendarCheck'
+              const done = linked ? isDoneOnDay(d.currentWeekLog, linked.id, todayIdx) : false
               return (
                 <div
                   key={appt.id}
-                  className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-3.5"
+                  className={cn(
+                    'flex items-center gap-3 rounded-3xl border-2 p-3.5',
+                    done ? 'border-brand-200 bg-brand-50' : 'border-slate-200 bg-white',
+                  )}
                 >
                   <IconChip icon={iconName} size="h-11 w-11" iconClassName="h-5 w-5" />
                   <div className="min-w-0 flex-1">
@@ -358,9 +362,24 @@ export function TodayPage() {
                       {appt.provider}
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-brand-100 px-2.5 py-1 text-xs font-extrabold text-brand-800">
-                    Today
-                  </span>
+                  {linked ? (
+                    <HomeItemControl
+                      done={done}
+                      name={appt.title}
+                      onYes={() => {
+                        sfx.done()
+                        actions.logDaily(linked.id, todayIdx, true)
+                      }}
+                      onUndo={() => {
+                        sfx.undo()
+                        actions.logDaily(linked.id, todayIdx, false)
+                      }}
+                    />
+                  ) : (
+                    <span className="shrink-0 rounded-full bg-brand-100 px-2.5 py-1 text-xs font-extrabold text-brand-800">
+                      Today
+                    </span>
+                  )}
                 </div>
               )
             })}

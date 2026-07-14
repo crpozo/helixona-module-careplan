@@ -113,6 +113,16 @@ export function BookingPage() {
     [takenHours],
   )
 
+  // Only offer start times that leave room for EVERY selected treatment, so a
+  // "select all" can never silently drop the ones that wouldn't fit.
+  const startableHours = useMemo(
+    () =>
+      availableHours.filter(
+        (_, i) => i + Math.max(1, selectedServices.length) <= availableHours.length,
+      ),
+    [availableHours, selectedServices.length],
+  )
+
   // Line the chosen treatments up in consecutive open slots from the start.
   const assigned = useMemo<{ service: Activity; hour: number }[]>(() => {
     if (startHour === null) return []
@@ -127,16 +137,23 @@ export function BookingPage() {
     if (!day || assigned.length === 0) return []
     const base = `apt-${Date.now().toString(36)}`
     const seriesId = repeatWeeks > 1 ? `series-${base}` : undefined
+    // A repeat week could land on a slot already booked in that later week;
+    // skip any occurrence that exactly matches an existing scheduled visit.
+    const taken = new Set(
+      state.appointments.filter((a) => a.status === 'scheduled').map((a) => a.date),
+    )
     const out: Appointment[] = []
     for (let w = 0; w < repeatWeeks; w++) {
       for (const { service, hour } of assigned) {
         const d = new Date(`${day.iso}T00:00:00`)
         d.setDate(d.getDate() + 7 * w)
+        const date = `${localIso(d)}T${pad2(hour)}:00:00`
+        if (taken.has(date)) continue
         out.push({
           id: `${base}-${w}-${service.id}`,
           activityId: service.id,
           title: service.name,
-          date: `${localIso(d)}T${pad2(hour)}:00:00`,
+          date,
           provider: state.patient.provider,
           location: 'Helixona Clinic',
           status: 'scheduled',
@@ -146,7 +163,7 @@ export function BookingPage() {
       }
     }
     return out.sort((a, b) => a.date.localeCompare(b.date))
-  }, [day, assigned, repeatWeeks, state.patient.provider])
+  }, [day, assigned, repeatWeeks, state.patient.provider, state.appointments])
 
   const stepIdx = PHASE_ORDER.indexOf(phase === 'done' ? 'confirm' : phase)
 
@@ -276,7 +293,23 @@ export function BookingPage() {
         </h1>
 
         {/* Step 1 — treatments (multi-select) */}
-        {phase === 'service' && (
+        {phase === 'service' && services.length === 0 && (
+          <div className="mt-8 rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
+            <p className="text-base font-extrabold text-slate-800">
+              No clinic treatments to book yet
+            </p>
+            <p className="mt-1 text-sm font-semibold text-slate-500">
+              Your care team will add in-office treatments to your plan, or you can add your
+              own in My Plan.
+            </p>
+            <Link to="/" className="mt-5 inline-block">
+              <Button variant="secondary" size="lg">
+                Back to home
+              </Button>
+            </Link>
+          </div>
+        )}
+        {phase === 'service' && services.length > 0 && (
           <>
             <p className="mt-1 text-center text-sm font-bold text-slate-500">
               Pick one or several — book them together.
@@ -374,7 +407,7 @@ export function BookingPage() {
               {selectedServices.length > 1 && ' · we’ll line them up back-to-back'}
             </p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              {availableHours.map((h) => (
+              {startableHours.map((h) => (
                 <button
                   key={h}
                   type="button"
@@ -389,9 +422,11 @@ export function BookingPage() {
                 </button>
               ))}
             </div>
-            {availableHours.length === 0 && (
+            {startableHours.length === 0 && (
               <p className="mt-6 rounded-2xl border-2 border-dashed border-slate-200 px-4 py-6 text-center text-sm font-semibold text-slate-400">
-                No open times left that day — go back and pick another.
+                {availableHours.length === 0
+                  ? 'No open times left that day — go back and pick another.'
+                  : `Only ${num(availableHours.length)} open ${plural(availableHours.length, 'slot')} that day — go back and pick fewer treatments or another day.`}
               </p>
             )}
           </>
@@ -478,7 +513,7 @@ export function BookingPage() {
         )}
       </main>
 
-      {phase === 'service' && (
+      {phase === 'service' && services.length > 0 && (
         <footer className="safe-bottom mx-auto w-full max-w-xl shrink-0 px-6 pb-6">
           <Button
             variant="primary"

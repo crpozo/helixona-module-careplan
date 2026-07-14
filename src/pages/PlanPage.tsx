@@ -184,9 +184,14 @@ const EMPTY_DRAFT = {
   days: [0, 2, 4] as number[], // Mon / Wed / Fri to start
 }
 
+/** Weekdays open for a location (clinic is closed on Sundays). */
+function spanFor(location: ActivityLocation): number {
+  return location === 'in_office' ? 6 : 7
+}
+
 /** Patient form: name a therapy, choose home/clinic + category, pick days. */
 function AddTherapyForm() {
-  const { actions } = useApp()
+  const { state, actions } = useApp()
   const [draft, setDraft] = useState(EMPTY_DRAFT)
   const [open, setOpen] = useState(false)
 
@@ -201,9 +206,24 @@ function AddTherapyForm() {
     })
   }
 
+  // Switching to the clinic drops Sunday (and anything else out of range) so
+  // the chosen days can never exceed what's actually schedulable.
+  function setLocation(location: ActivityLocation) {
+    setDraft((d) => {
+      const span = spanFor(location)
+      let days = d.days.filter((x) => x < span)
+      if (days.length === 0) days = [0]
+      return { ...d, location, days }
+    })
+  }
+
   function add() {
     if (!canAdd) return
-    const days = [...draft.days].sort((a, b) => a - b)
+    const span = spanFor(draft.location)
+    const days = [...new Set(draft.days.filter((x) => x >= 0 && x < span))].sort(
+      (a, b) => a - b,
+    )
+    if (days.length === 0) return
     const points = draft.category === 'iv' || draft.category === 'treatment' ? 15 : 5
     const activity: Activity = {
       id: slugId(draft.name),
@@ -215,6 +235,7 @@ function AddTherapyForm() {
       icon: DEFAULT_ACTIVITY_ICON[draft.category],
       days,
       addedBy: 'patient',
+      startWeek: state.currentWeek,
     }
     actions.upsertActivity(activity)
     setDraft(EMPTY_DRAFT)
@@ -262,9 +283,7 @@ function AddTherapyForm() {
               id="own-location"
               className={input}
               value={draft.location}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, location: e.target.value as ActivityLocation }))
-              }
+              onChange={(e) => setLocation(e.target.value as ActivityLocation)}
             >
               <option value="at_home">At home</option>
               <option value="in_office">At the clinic</option>

@@ -50,6 +50,15 @@ export function actualFor(activity: Activity, week: WeekLog): number {
   return clamp(Math.round(raw), 0, activity.timesPerWeek)
 }
 
+/**
+ * The activities that count for a given week. A patient-added therapy carries
+ * a startWeek, so weeks before it existed aren't retroactively penalized (its
+ * adherence, points, streaks and badges only apply from that week on).
+ */
+export function activitiesForWeek(activities: Activity[], weekNumber: number): Activity[] {
+  return activities.filter((a) => a.startWeek == null || weekNumber >= a.startWeek)
+}
+
 export function computeWeekAdherence(
   activities: Activity[],
   week: WeekLog,
@@ -79,7 +88,13 @@ export function computeWeekAdherence(
 export function allWeekAdherence(state: AppState): WeekAdherence[] {
   return [...state.weeks]
     .sort((a, b) => a.weekNumber - b.weekNumber)
-    .map((w) => computeWeekAdherence(state.plan.activities, w, state.adherenceTarget))
+    .map((w) =>
+      computeWeekAdherence(
+        activitiesForWeek(state.plan.activities, w.weekNumber),
+        w,
+        state.adherenceTarget,
+      ),
+    )
 }
 
 // --- Points -----------------------------------------------------------------
@@ -116,7 +131,13 @@ export function weekPoints(
 
 export function lifetimePoints(state: AppState): number {
   return state.weeks.reduce(
-    (sum, w) => sum + weekPoints(state.plan.activities, w, state.adherenceTarget),
+    (sum, w) =>
+      sum +
+      weekPoints(
+        activitiesForWeek(state.plan.activities, w.weekNumber),
+        w,
+        state.adherenceTarget,
+      ),
     0,
   )
 }
@@ -130,7 +151,11 @@ export function pointsSummary(state: AppState): PointsSummary {
   const spent = spentPoints(state)
   const current = state.weeks.find((w) => w.weekNumber === state.currentWeek)
   const thisWeek = current
-    ? weekPoints(state.plan.activities, current, state.adherenceTarget)
+    ? weekPoints(
+        activitiesForWeek(state.plan.activities, current.weekNumber),
+        current,
+        state.adherenceTarget,
+      )
     : 0
   return {
     lifetime,
@@ -180,8 +205,11 @@ export function streakInfo(state: AppState): StreakInfo {
   const done = completedWeeks(state)
   const onTarget = done.map(
     (w) =>
-      computeWeekAdherence(state.plan.activities, w, state.adherenceTarget).pct >=
-      state.adherenceTarget,
+      computeWeekAdherence(
+        activitiesForWeek(state.plan.activities, w.weekNumber),
+        w,
+        state.adherenceTarget,
+      ).pct >= state.adherenceTarget,
   )
 
   // Current streak — count back from the last completed week.
@@ -201,8 +229,11 @@ export function streakInfo(state: AppState): StreakInfo {
 
   const currentWeekLog = state.weeks.find((w) => w.weekNumber === state.currentWeek)
   const currentPct = currentWeekLog
-    ? computeWeekAdherence(state.plan.activities, currentWeekLog, state.adherenceTarget)
-        .pct
+    ? computeWeekAdherence(
+        activitiesForWeek(state.plan.activities, currentWeekLog.weekNumber),
+        currentWeekLog,
+        state.adherenceTarget,
+      ).pct
     : 0
   const atRisk = current > 0 && currentPct < state.adherenceTarget
 
@@ -221,7 +252,11 @@ export function evaluateBadges(state: AppState): EvaluatedBadge[] {
   const adherences = weeks
     .map((w) => ({
       week: w,
-      adh: computeWeekAdherence(plan.activities, w, adherenceTarget),
+      adh: computeWeekAdherence(
+        activitiesForWeek(plan.activities, w.weekNumber),
+        w,
+        adherenceTarget,
+      ),
     }))
     .sort((a, b) => a.week.weekNumber - b.week.weekNumber)
 
@@ -235,10 +270,12 @@ export function evaluateBadges(state: AppState): EvaluatedBadge[] {
   const firstOnTargetWeek = adherences.find((x) => x.adh.pct >= adherenceTarget)?.week
     .startDate
   const perfectWeek = adherences.find((x) => x.adh.pct >= 100)?.week.startDate
-  const homeWeek = adherences.find((x) => fullyCompleted(homeActivities, x.week))?.week
-    .startDate
-  const officeWeek = adherences.find((x) => fullyCompleted(officeActivities, x.week))
-    ?.week.startDate
+  const homeWeek = adherences.find((x) =>
+    fullyCompleted(activitiesForWeek(homeActivities, x.week.weekNumber), x.week),
+  )?.week.startDate
+  const officeWeek = adherences.find((x) =>
+    fullyCompleted(activitiesForWeek(officeActivities, x.week.weekNumber), x.week),
+  )?.week.startDate
   const bestWeekPct = adherences.reduce((m, x) => Math.max(m, x.adh.pct), 0)
   const firstRedemptionDate = [...redemptions].sort((a, b) =>
     a.date.localeCompare(b.date),

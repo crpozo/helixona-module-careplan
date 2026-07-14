@@ -80,6 +80,12 @@ export interface Activity {
    * Missing is treated as 'staff' (all seeded/prescribed items).
    */
   addedBy?: 'staff' | 'patient'
+  /**
+   * Week number this activity began counting. Set when a patient adds their
+   * own therapy so earlier weeks aren't scored against something that didn't
+   * exist yet. Missing means "since the start of the plan".
+   */
+  startWeek?: number
 }
 
 /** One week of tracking — ordered comes from the plan, this holds actuals. */

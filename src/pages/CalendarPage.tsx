@@ -227,7 +227,7 @@ export function CalendarPage() {
                 type="button"
                 onClick={() => setSelected(cell)}
                 aria-pressed={isSelected}
-                aria-label={`${formatDate(dayKey(cell), { weekday: 'long', month: 'long', day: 'numeric' })}, ${appts.length} ${plural(appts.length, 'visit')}`}
+                aria-label={`${cell.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}, ${appts.length} ${plural(appts.length, 'visit')}`}
                 className={cn(
                   'flex min-h-[2.75rem] flex-col items-center rounded-xl border-2 py-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
                   isSelected
@@ -272,7 +272,11 @@ export function CalendarPage() {
         <h2 className="px-1 text-base font-extrabold text-slate-800">
           {sameDay(selected, today)
             ? 'Today'
-            : formatDate(dayKey(selected), { weekday: 'long', month: 'long', day: 'numeric' })}
+            : selected.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })}
         </h2>
         {selectedAppts.length === 0 ? (
           <div className="flex items-center gap-3 rounded-3xl border-2 border-dashed border-slate-200 bg-white p-4">
