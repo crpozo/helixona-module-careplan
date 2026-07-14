@@ -35,13 +35,20 @@ export function CheckinPage() {
   const { state, actions } = useApp()
   const navigate = useNavigate()
 
-  // Only TODAY's scheduled, not-yet-done items — one small list, never the
-  // whole week (see src/lib/schedule.ts for how weekly orders map to days).
+  // The home check-in tracks only what the patient does themselves — at-home
+  // therapies, supplements and medicines. In-office treatments are attended in
+  // person and live on the Calendar, so they're kept out of this flow. We take
+  // TODAY's scheduled, not-yet-done items only (see src/lib/schedule.ts).
   const todayIdx = weekdayIndex(new Date())
   const [steps] = useState<Step[]>(() => {
     const week = state.weeks.find((w) => w.weekNumber === state.currentWeek)
     return state.plan.activities
-      .filter((a) => isScheduledOn(a, todayIdx) && !isDoneOnDay(week, a.id, todayIdx))
+      .filter(
+        (a) =>
+          a.location === 'at_home' &&
+          isScheduledOn(a, todayIdx) &&
+          !isDoneOnDay(week, a.id, todayIdx),
+      )
       .map((a) => ({
         id: a.id,
         name: a.name,
@@ -164,7 +171,10 @@ export function CheckinPage() {
         key={step.id}
         className="mx-auto flex w-full max-w-xl min-h-0 flex-1 animate-fade-up flex-col items-center justify-center overflow-y-auto px-6 py-6 text-center"
       >
-        <p className="text-sm font-extrabold uppercase tracking-wide text-slate-400 tnum">
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-brand-600">
+          Home check-in
+        </p>
+        <p className="mt-1 text-sm font-extrabold uppercase tracking-wide text-slate-400 tnum">
           Step {idx + 1} of {steps.length}
         </p>
 

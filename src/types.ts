@@ -69,6 +69,17 @@ export interface Activity {
   durationMin?: number
   /** lucide-react icon name. */
   icon: string
+  /**
+   * Explicit weekdays this runs on (Mon=0 … Sun=6). When set, it overrides the
+   * auto-spread schedule — this is how a patient "organizes therapies by day".
+   */
+  days?: number[]
+  /**
+   * Who put this on the plan. Clinician-authored items are read-only to the
+   * patient; items the patient added themselves they can also edit/remove.
+   * Missing is treated as 'staff' (all seeded/prescribed items).
+   */
+  addedBy?: 'staff' | 'patient'
 }
 
 /** One week of tracking — ordered comes from the plan, this holds actuals. */
@@ -154,6 +165,12 @@ export interface Appointment {
   provider: string
   location: string
   status: AppointmentStatus
+  /** Length in minutes — drives calendar export (defaults to 60 when absent). */
+  durationMin?: number
+  /** Groups the occurrences of a recurring booking so a series reads as one. */
+  seriesId?: string
+  /** Optional free-text note carried onto the calendar event. */
+  notes?: string
 }
 
 export type ProgramKey = 'wellness' | 'chronic' | 'neuro'

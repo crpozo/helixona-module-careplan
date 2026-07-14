@@ -16,6 +16,9 @@ const PlanPage = lazy(() =>
 const WeekPage = lazy(() =>
   import('@/pages/WeekPage').then((m) => ({ default: m.WeekPage })),
 )
+const CalendarPage = lazy(() =>
+  import('@/pages/CalendarPage').then((m) => ({ default: m.CalendarPage })),
+)
 const ProgressPage = lazy(() =>
   import('@/pages/ProgressPage').then((m) => ({ default: m.ProgressPage })),
 )
@@ -100,6 +103,16 @@ function AuthenticatedApp() {
                 <RequirePatient>
                   <Suspense fallback={<RouteFallback />}>
                     <WeekPage />
+                  </Suspense>
+                </RequirePatient>
+              }
+            />
+            <Route
+              path="calendar"
+              element={
+                <RequirePatient>
+                  <Suspense fallback={<RouteFallback />}>
+                    <CalendarPage />
                   </Suspense>
                 </RequirePatient>
               }

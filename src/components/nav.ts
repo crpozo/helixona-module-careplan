@@ -17,6 +17,12 @@ export const PATIENT_NAV: NavItem[] = [
     subtitle: 'By day, week, month or treatment',
   },
   {
+    to: '/calendar',
+    label: 'Calendar',
+    icon: 'CalendarCheck',
+    subtitle: 'All your booked visits',
+  },
+  {
     to: '/progress',
     label: 'Progress',
     icon: 'Activity',

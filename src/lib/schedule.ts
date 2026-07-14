@@ -11,7 +11,8 @@
 
 import type { Activity, WeekLog } from '@/types'
 
-type Schedulable = Pick<Activity, 'id' | 'timesPerWeek' | 'location'>
+type Schedulable = Pick<Activity, 'id' | 'timesPerWeek' | 'location'> &
+  Pick<Partial<Activity>, 'days'>
 
 /** Monday-first weekday index (Mon=0 … Sun=6). */
 export function weekdayIndex(date: Date): number {
@@ -30,6 +31,10 @@ function hash(s: string): number {
 /** The fixed weekdays this activity is scheduled on (Mon=0 … Sun=6). */
 export function scheduledDays(a: Schedulable): number[] {
   const span = a.location === 'in_office' ? 6 : 7 // clinic closed on Sundays
+  // Patient-chosen days win over the auto-spread (clamped to open weekdays).
+  if (a.days && a.days.length > 0) {
+    return [...new Set(a.days.filter((d) => d >= 0 && d < span))].sort((x, y) => x - y)
+  }
   const n = Math.min(Math.max(0, Math.round(a.timesPerWeek)), span)
   if (n === 0) return []
   const offset = hash(a.id) % span
