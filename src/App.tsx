@@ -13,9 +13,6 @@ import { LoginPage } from '@/pages/LoginPage'
 const PlanPage = lazy(() =>
   import('@/pages/PlanPage').then((m) => ({ default: m.PlanPage })),
 )
-const WeekPage = lazy(() =>
-  import('@/pages/WeekPage').then((m) => ({ default: m.WeekPage })),
-)
 const CalendarPage = lazy(() =>
   import('@/pages/CalendarPage').then((m) => ({ default: m.CalendarPage })),
 )
@@ -93,16 +90,6 @@ function AuthenticatedApp() {
                 <RequirePatient>
                   <Suspense fallback={<RouteFallback />}>
                     <PlanPage />
-                  </Suspense>
-                </RequirePatient>
-              }
-            />
-            <Route
-              path="week"
-              element={
-                <RequirePatient>
-                  <Suspense fallback={<RouteFallback />}>
-                    <WeekPage />
                   </Suspense>
                 </RequirePatient>
               }

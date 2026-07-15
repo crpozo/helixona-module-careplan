@@ -9,13 +9,7 @@ export interface NavItem {
 
 export const PATIENT_NAV: NavItem[] = [
   { to: '/', label: 'Today', icon: 'Sun', end: true, subtitle: 'Your day at a glance' },
-  { to: '/plan', label: 'My Plan', icon: 'HeartPulse', subtitle: 'Your full plan of care' },
-  {
-    to: '/week',
-    label: 'Schedule',
-    icon: 'CalendarDays',
-    subtitle: 'By day, week, month or treatment',
-  },
+  { to: '/plan', label: 'My Plan', icon: 'HeartPulse', subtitle: 'Your therapies on a calendar' },
   {
     to: '/calendar',
     label: 'Calendar',

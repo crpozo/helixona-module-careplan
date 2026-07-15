@@ -43,6 +43,19 @@ export interface PacingDef {
 
 export type ActivityLocation = 'in_office' | 'at_home'
 
+/**
+ * How often a therapy repeats when it isn't a simple weekly cadence. Weekly
+ * therapies use `Activity.days` (specific weekdays, every week); anything less
+ * frequent uses this — "every N weeks" or "every N months" from an anchor date.
+ */
+export interface Recurrence {
+  unit: 'week' | 'month'
+  /** Repeat every N units (>= 1). "Every 2 weeks" is { unit:'week', interval:2 }. */
+  interval: number
+  /** ISO date (YYYY-MM-DD) the schedule counts from. */
+  anchor: string
+}
+
 export type ActivityCategory =
   | 'treatment' // nano bath, red light, hydrogen, salt room, eboo …
   | 'iv' // IV therapy
@@ -86,6 +99,12 @@ export interface Activity {
    * exist yet. Missing means "since the start of the plan".
    */
   startWeek?: number
+  /**
+   * Present for therapies that repeat less often than weekly (e.g. every 2
+   * weeks or every 2 months). When set, the item is a scheduled reminder shown
+   * on the plan calendar rather than a weekly-tracked item (timesPerWeek 0).
+   */
+  recurrence?: Recurrence
 }
 
 /** One week of tracking — ordered comes from the plan, this holds actuals. */

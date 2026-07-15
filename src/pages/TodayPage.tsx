@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Check, ChevronRight, ListChecks, Plus } from 'lucide-react'
 import type { Activity, StageKey } from '@/types'
 import { useApp, useDerived } from '@/store/store'
-import { isDoneOnDay, isScheduledOn, weekdayIndex } from '@/lib/schedule'
+import { isDoneOnDay, isScheduledOn, recurrenceLabel, weekdayIndex } from '@/lib/schedule'
 import { STAGES, STAGE_BY_KEY } from '@/lib/plan'
 import { formatDate, num, plural } from '@/lib/format'
 import { getIcon } from '@/lib/icons'
@@ -169,7 +169,7 @@ function ClinicBookRow({ activity }: { activity: Activity }) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-extrabold text-slate-800">{activity.name}</p>
         <p className="truncate text-xs font-semibold text-slate-500">
-          <span className="tnum">{activity.timesPerWeek}</span>× / week
+          {recurrenceLabel(activity)}
           {activity.durationMin ? ` · ≈${activity.durationMin} min` : ''}
         </p>
       </div>
@@ -505,7 +505,7 @@ export function TodayPage() {
           label="points"
         />
         <StatTile
-          to="/week"
+          to="/plan"
           icon="CalendarDays"
           iconClass="text-sky-500"
           value={num(state.currentWeek)}
