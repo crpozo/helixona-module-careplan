@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   CalendarCheck,
   CalendarPlus,
@@ -79,6 +79,7 @@ function nextClinicDays(count: number): { iso: string; weekday: string; label: s
 export function BookingPage() {
   const { state, actions } = useApp()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const services = useMemo(
     () => state.plan.activities.filter((a) => a.location === 'in_office'),
@@ -86,8 +87,14 @@ export function BookingPage() {
   )
   const days = useMemo(() => nextClinicDays(8), [])
 
+  // A "Book" tap on a specific clinic therapy (Today) preselects it here.
+  const preselectId = (location.state as { serviceId?: string } | null)?.serviceId
   const [phase, setPhase] = useState<Phase>('service')
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() =>
+    preselectId && services.some((s) => s.id === preselectId)
+      ? new Set([preselectId])
+      : new Set(),
+  )
   const [day, setDay] = useState<(typeof days)[number] | null>(null)
   const [startHour, setStartHour] = useState<number | null>(null)
   const [repeatWeeks, setRepeatWeeks] = useState(1)

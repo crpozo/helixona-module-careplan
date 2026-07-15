@@ -161,6 +161,28 @@ function HomeRow({
   )
 }
 
+/** One clinic therapy the patient still needs to book — jumps into booking. */
+function ClinicBookRow({ activity }: { activity: Activity }) {
+  return (
+    <div className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-3.5">
+      <IconChip icon={activity.icon} size="h-11 w-11" iconClassName="h-5 w-5" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-extrabold text-slate-800">{activity.name}</p>
+        <p className="truncate text-xs font-semibold text-slate-500">
+          <span className="tnum">{activity.timesPerWeek}</span>× / week
+          {activity.durationMin ? ` · ≈${activity.durationMin} min` : ''}
+        </p>
+      </div>
+      <Link to="/book" state={{ serviceId: activity.id }} className="shrink-0">
+        <Button variant="primary" size="sm">
+          <Plus className="h-4 w-4" />
+          Book
+        </Button>
+      </Link>
+    </div>
+  )
+}
+
 /**
  * The patient home: where you are in the journey, then exactly what to do today
  * split into "At home" (things you do yourself, checkable here) and "At the
@@ -199,6 +221,14 @@ export function TodayPage() {
     [state.appointments, now],
   )
   const nextVisit = d.upcoming.find((a) => !sameDay(new Date(a.date), now))
+
+  // Clinic therapies the patient still needs to book: the in-office items on
+  // the plan that don't yet have an upcoming scheduled visit.
+  const clinicActivities = state.plan.activities.filter((a) => a.location === 'in_office')
+  const bookedActivityIds = new Set(
+    d.upcoming.map((a) => a.activityId).filter((id): id is string => Boolean(id)),
+  )
+  const clinicToBook = clinicActivities.filter((a) => !bookedActivityIds.has(a.id))
 
   function markAllHomeDone() {
     const pending = homeRows.filter(
@@ -338,7 +368,8 @@ export function TodayPage() {
           </Link>
         </div>
 
-        {clinicToday.length > 0 ? (
+        {/* Booked clinic visits happening today */}
+        {clinicToday.length > 0 && (
           <div className="space-y-2.5">
             {clinicToday.map((appt) => {
               const linked = appt.activityId
@@ -384,14 +415,38 @@ export function TodayPage() {
               )
             })}
           </div>
-        ) : (
+        )}
+
+        {/* Clinic therapies still to book */}
+        {clinicToBook.length > 0 && (
+          <>
+            <div className="flex items-center justify-between px-1 pt-1">
+              <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">
+                To book · {num(clinicToBook.length)} {plural(clinicToBook.length, 'therapy', 'therapies')}
+              </p>
+              {clinicToBook.length > 1 && (
+                <Link to="/book" className="text-xs font-extrabold text-brand-700 hover:underline">
+                  Book all
+                </Link>
+              )}
+            </div>
+            <div className="space-y-2.5">
+              {clinicToBook.map((a) => (
+                <ClinicBookRow key={a.id} activity={a} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Nothing today and nothing left to book */}
+        {clinicToday.length === 0 && clinicToBook.length === 0 && (
           <div className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-4">
             <IconChip icon="CalendarCheck" size="h-11 w-11" iconClassName="h-5 w-5" />
             <div className="min-w-0 flex-1">
               {nextVisit ? (
                 <>
                   <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">
-                    No clinic visit today · next up
+                    All booked · next up
                   </p>
                   <p className="truncate text-sm font-extrabold text-slate-800">
                     {nextVisit.title}
@@ -408,19 +463,27 @@ export function TodayPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-extrabold text-slate-800">No visits booked</p>
+                  <p className="text-sm font-extrabold text-slate-800">
+                    {clinicActivities.length === 0
+                      ? 'No clinic therapies in your plan yet'
+                      : "You're all booked"}
+                  </p>
                   <p className="text-xs font-semibold text-slate-500">
-                    Book your next treatment in under a minute.
+                    {clinicActivities.length === 0
+                      ? 'Your care team will add in-office treatments.'
+                      : 'Nothing left to schedule right now.'}
                   </p>
                 </>
               )}
             </div>
-            <Link to="/book" className="shrink-0">
-              <Button variant={nextVisit ? 'secondary' : 'primary'} size="sm">
-                <Plus className="h-4 w-4" />
-                Book
-              </Button>
-            </Link>
+            {clinicActivities.length > 0 && (
+              <Link to="/book" className="shrink-0">
+                <Button variant="secondary" size="sm">
+                  <Plus className="h-4 w-4" />
+                  Book
+                </Button>
+              </Link>
+            )}
           </div>
         )}
       </section>
