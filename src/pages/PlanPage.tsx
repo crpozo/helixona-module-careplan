@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react'
 import type { Activity, ActivityCategory, ActivityLocation, Recurrence } from '@/types'
 import { useApp } from '@/store/store'
 import { Card } from '@/components/Card'
@@ -240,19 +240,102 @@ function DayPicker({
   )
 }
 
-/** One care-team (read-only) therapy row. */
-function CareTeamRow({ activity }: { activity: Activity }) {
+// --- Grouped, collapsible care-team plan ------------------------------------
+
+type BucketKey = 'clinic' | 'home' | 'supplement'
+
+/** Where each therapy belongs in the plan list — mirrors the calendar legend. */
+function bucketOf(a: Activity): BucketKey {
+  if (a.location === 'in_office') return 'clinic'
+  if (a.category === 'supplement' || a.category === 'medication') return 'supplement'
+  return 'home'
+}
+
+const BUCKET_META: Record<BucketKey, { label: string; dot: string; tint: string }> = {
+  clinic: { label: 'Clinic visits', dot: 'bg-brand-500', tint: 'bg-brand-50' },
+  home: { label: 'Home therapies', dot: 'bg-sky-500', tint: 'bg-sky-50' },
+  supplement: { label: 'Supplements & medications', dot: 'bg-emerald-500', tint: 'bg-emerald-50' },
+}
+
+const BUCKET_ORDER: BucketKey[] = ['clinic', 'home', 'supplement']
+
+/** One collapsible category of the prescribed plan. Collapsed by default so the
+ *  page stays short — the count and chevron make the content discoverable. */
+function CareTeamGroup({
+  bucket,
+  items,
+  defaultOpen,
+}: {
+  bucket: BucketKey
+  items: Activity[]
+  defaultOpen: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  const meta = BUCKET_META[bucket]
+  const panelId = `care-group-${bucket}`
+
   return (
-    <li className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-4">
-      <IconChip icon={activity.icon} size="h-11 w-11" iconClassName="h-5 w-5" />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-extrabold text-slate-800">{activity.name}</p>
-        <p className="mt-0.5 text-xs font-semibold text-slate-400">
-          {LOCATION_LABEL[activity.location]} · {recurrenceLabel(activity)}
-        </p>
-      </div>
-      <LearnTip activity={activity} />
-    </li>
+    <div className="overflow-hidden rounded-3xl border-2 border-slate-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500"
+      >
+        <span className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', meta.tint)}>
+          <span className={cn('h-2.5 w-2.5 rounded-full', meta.dot)} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-extrabold text-slate-800">{meta.label}</p>
+          <p className="text-xs font-semibold text-slate-400">
+            {items.length} {plural(items.length, 'therapy', 'therapies')}
+          </p>
+        </div>
+        <ChevronDown
+          className={cn(
+            'h-5 w-5 shrink-0 text-slate-400 transition-transform',
+            open && 'rotate-180',
+          )}
+          aria-hidden
+        />
+      </button>
+
+      {open && (
+        <ul id={panelId} className="divide-y divide-slate-100 border-t-2 border-slate-100">
+          {items.map((a) => (
+            <li key={a.id} className="flex items-center gap-3 px-4 py-3">
+              <IconChip icon={a.icon} size="h-11 w-11" iconClassName="h-5 w-5" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-extrabold text-slate-800">{a.name}</p>
+                <p className="mt-0.5 truncate text-xs font-semibold text-slate-400">
+                  {LOCATION_LABEL[a.location]} · {recurrenceLabel(a)}
+                </p>
+              </div>
+              <LearnTip activity={a} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+/** The prescribed plan, bucketed into collapsible sections. */
+function CareTeamGroups({ activities }: { activities: Activity[] }) {
+  const groups = useMemo(() => {
+    return BUCKET_ORDER.map((key) => ({
+      key,
+      items: activities.filter((a) => bucketOf(a) === key),
+    })).filter((g) => g.items.length > 0)
+  }, [activities])
+
+  return (
+    <div className="space-y-3">
+      {groups.map((g) => (
+        <CareTeamGroup key={g.key} bucket={g.key} items={g.items} defaultOpen={false} />
+      ))}
+    </div>
   )
 }
 
@@ -572,15 +655,17 @@ export function PlanPage() {
       {/* Calendar of therapies */}
       <TherapyCalendar activities={plan.activities} />
 
-      {/* All the therapies, listed */}
+      {/* The prescribed plan, grouped into collapsible sections so the whole
+          week isn't dumped as one long list. */}
       {prescribed.length > 0 && (
         <section className="space-y-3">
-          <h2 className="px-1 text-base font-extrabold text-slate-800">From your care team</h2>
-          <ul className="space-y-3">
-            {prescribed.map((a) => (
-              <CareTeamRow key={a.id} activity={a} />
-            ))}
-          </ul>
+          <div className="flex items-baseline justify-between px-1">
+            <h2 className="text-base font-extrabold text-slate-800">From your care team</h2>
+            <span className="text-xs font-bold text-slate-400">
+              {prescribed.length} {plural(prescribed.length, 'therapy', 'therapies')}
+            </span>
+          </div>
+          <CareTeamGroups activities={prescribed} />
         </section>
       )}
 
